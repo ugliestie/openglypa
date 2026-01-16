@@ -1,0 +1,5 @@
+mc.py
+python-dotenv
+environs
+aiofile
+aiogram
