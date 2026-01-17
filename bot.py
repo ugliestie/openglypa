@@ -9,7 +9,7 @@ from aiofile import AIOFile
 import re
 import random
 
-from utils.config import TOKEN, RANDOM_SEND, USUAL_SYNTAX
+from utils.config import TOKEN, RANDOM_SEND, USUAL_SYNTAX, CHANCE
 
 import mc
 from mc.builtin import validators
@@ -23,6 +23,14 @@ logger = logging.getLogger(__name__)
 link_pattern = re.compile(
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 )
+commands_pattern = re.compile(
+    r"h j [a-z]\Z"
+)
+
+def chance_hit(percent):
+    if random()*100 < percent:
+        return True
+    return False
 
 async def write_words(*args):
     text, file = args
@@ -30,12 +38,7 @@ async def write_words(*args):
         text = text.replace("\n", ". ").replace("\n\n", ". ")
         await f.write(text + ",")
 
-async def send_and_gen_sentence(*args):
-    file, chat_id = args
-    if not os.path.exists(file):
-        message = "База слов для этой беседы ещё не существует"
-        await bot.send_message(chat_id, message)
-        return
+async def gen(file):
     async with AIOFile(file, encoding="utf-8") as f:
         text = await f.read()
         text_model = [sample.strip() for sample in text.split(",")]
@@ -46,9 +49,7 @@ async def send_and_gen_sentence(*args):
         validators.chars_count(minimal=10, maximal=100),
     ],
     )
-    if not message:
-        message = "База слов слишком мала для генерации"
-    await bot.send_message(chat_id, message)
+    return message
 
 # Объект бота
 bot = Bot(token=TOKEN)
@@ -62,30 +63,38 @@ async def cmd_start(message: types.Message):
 
 @dp.message(F.text.lower() == 'h j g')
 async def force_generate(message: types.Message):
-    await send_and_gen_sentence(
-                f"chats/{message.chat.id}.txt", message.chat.id
-            )
+    try:
+        gen_message = await gen(f"chats/{message.chat.id}.txt")
+        await bot.send_message(message.chat.id, gen_message)
+    except:
+        await bot.send_message(message.chat.id, "База слов слишком мала для генерации")
 
 @dp.message(F.text.lower() == 'h j p')
-async def force_generate(message: types.Message):
-    await send_and_gen_sentence(
-                f"chats/{message.chat.id}.txt", message.chat.id
-            )
+async def generate_poll(message: types.Message):
+    await bot.send_poll(
+        chat_id=message.chat.id,
+        question=await gen(f"chats/{message.chat.id}.txt"),
+        options=[await gen(f"chats/{message.chat.id}.txt"), await gen(f"chats/{message.chat.id}.txt"), await gen(f"chats/{message.chat.id}.txt"), await gen(f"chats/{message.chat.id}.txt")],
+        explanation=await gen(f"chats/{message.chat.id}.txt"),
+        is_anonymous=False,
+    )
 
 @dp.message(F.text)
 async def any_message(message: Message):
     if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
-        logger.log(1, "logged")
-        if random.randint(0, 33) <= 24 and RANDOM_SEND:
-            await send_and_gen_sentence(
-                f"chats/{message.chat.id}.txt", message.chat.id
-            )
-        if not re.findall(link_pattern, message.text):
+        if RANDOM_SEND and chance_hit(CHANCE):
+            try:
+                gen_message = await gen(f"chats/{message.chat.id}.txt")
+                await bot.send_message(message.chat.id, gen_message)
+            except:
+                await bot.send_message(message.chat.id, "База слов слишком мала для генерации")
+        if not re.findall(link_pattern, message.text) and not re.findall(commands_pattern, message.text):
             await write_words(message.text, f"chats/{message.chat.id}.txt")
         
 
 # Запуск процесса поллинга новых апдейтов
 async def main():
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
