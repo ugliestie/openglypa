@@ -28,7 +28,7 @@ commands_pattern = re.compile(
 )
 
 def chance_hit(percent):
-    if random()*100 < percent:
+    if random.random()*100 < percent:
         return True
     return False
 
