@@ -71,7 +71,7 @@ async def gen_topor(file):
         text = await f.read()
         text_model = [sample.strip() for sample in text.split(",")]
     emojis = ['📣', '‼️', '❗️', '❓', '⚡️']
-    return random.choice(emojis) + ' ' + random.choice(text_model)[:random.randrange(2,8)]
+    return str(random.choice(emojis) + ' ' + random.choice(text_model)[:random.randrange(2,8)])
 
 # Объект бота
 bot = Bot(token=TOKEN)
