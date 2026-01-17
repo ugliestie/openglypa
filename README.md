@@ -1,7 +1,7 @@
 # Openglypa
 Telegram-бот, генерирующий контент на основе сообщений других пользователей в чате, используя цепь Маркова
 
-> Создан на основе [NeuronBot](https://github.com/kesha1225/NeuronBot)
+> Создан на основе [NeuronBot](https://github.com/kesha1225/NeuronBot) с обновлениями под новую структуру mc.py и Aiogram
 
 ### TODO
 - [x] Генерация сообщений с помощью цепи Маркова
