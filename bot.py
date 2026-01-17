@@ -24,7 +24,7 @@ link_pattern = re.compile(
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 )
 commands_pattern = re.compile(
-    r"h j [a-z]\Z"
+    r"h j [a-z] [a-z]+|h j [a-z] \d+\Z"
 )
 
 def chance_hit(percent):
@@ -54,7 +54,7 @@ async def gen(file, chars=None, words=None):
         message = generator.generate_phrase(
         attempts=5000,
         validators=[
-            validators.words_count(minimal=words-1, maximal=words+1)
+            validators.words_count(minimal=words-1, maximal=words+5)
         ],
         )
     else:
@@ -85,6 +85,8 @@ async def force_generate(message: types.Message):
                 gen_message = await gen(file=f"chats/{message.chat.id}.txt", count=int(arg))
             elif arg == 'l':
                 gen_message = await gen(file=f"chats/{message.chat.id}.txt", words=30) 
+            else:
+                return
         else:
             gen_message = await gen(file=f"chats/{message.chat.id}.txt")
         await bot.send_message(message.chat.id, gen_message)
