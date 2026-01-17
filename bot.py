@@ -112,7 +112,7 @@ async def generate_poll(message: types.Message):
 
 @dp.message(F.text.lower() == 'h j t')
 async def generate_topor(message: types.Message):
-    await bot.send_message(message.chat.id, gen_topor)
+    await bot.send_message(message.chat.id, gen_topor(f"chats/{message.chat.id}.txt"))
 
 
 @dp.message(F.text)
