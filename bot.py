@@ -79,6 +79,16 @@ async def generate_poll(message: types.Message):
         is_anonymous=False,
     )
 
+@dp.message(F.text.lower() == 'h j t')
+async def generate_topor(message: types.Message):
+    async with AIOFile(f"chats/{message.chat.id}.txt", encoding="utf-8") as f:
+        text = await f.read()
+        text_model = [sample.strip() for sample in text.split(",")]
+    emojis = ['📣', '‼️', '❗️', '❓', '⚡️']
+    phrase = random.choice(emojis) + ' ' + random.choice(text_model)[:random.randrange(1,5)]
+    await bot.send_message(message.chat.id, phrase)
+
+
 @dp.message(F.text)
 async def any_message(message: Message):
     if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
