@@ -85,7 +85,7 @@ async def generate_topor(message: types.Message):
         text = await f.read()
         text_model = [sample.strip() for sample in text.split(",")]
     emojis = ['📣', '‼️', '❗️', '❓', '⚡️']
-    phrase = random.choice(emojis) + ' ' + random.choice(text_model)[:random.randrange(1,5)]
+    phrase = random.choice(emojis) + ' ' + random.choice(text_model)[:random.randrange(2,8)]
     await bot.send_message(message.chat.id, phrase)
 
 
