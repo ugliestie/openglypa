@@ -66,6 +66,13 @@ async def gen(file, chars=None, words=None):
         )
     return message
 
+async def gen_topor(file):
+    async with AIOFile(file, encoding="utf-8") as f:
+        text = await f.read()
+        text_model = [sample.strip() for sample in text.split(",")]
+    emojis = ['📣', '‼️', '❗️', '❓', '⚡️']
+    return random.choice(emojis) + ' ' + random.choice(text_model)[:random.randrange(2,8)]
+
 # Объект бота
 bot = Bot(token=TOKEN)
 # Диспетчер
@@ -105,12 +112,7 @@ async def generate_poll(message: types.Message):
 
 @dp.message(F.text.lower() == 'h j t')
 async def generate_topor(message: types.Message):
-    async with AIOFile(f"chats/{message.chat.id}.txt", encoding="utf-8") as f:
-        text = await f.read()
-        text_model = [sample.strip() for sample in text.split(",")]
-    emojis = ['📣', '‼️', '❗️', '❓', '⚡️']
-    phrase = random.choice(emojis) + ' ' + random.choice(text_model)[:random.randrange(2,8)]
-    await bot.send_message(message.chat.id, phrase)
+    await bot.send_message(message.chat.id, gen_topor)
 
 
 @dp.message(F.text)
@@ -118,10 +120,13 @@ async def any_message(message: Message):
     if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
         if RANDOM_SEND and chance_hit(CHANCE):
             try:
-                gen_message = await gen(f"chats/{message.chat.id}.txt")
+                if chance_hit(10):
+                    gen_message = await gen_topor(f"chats/{message.chat.id}.txt")
+                else:
+                    gen_message = await gen(f"chats/{message.chat.id}.txt")
                 await bot.send_message(message.chat.id, gen_message)
             except:
-                await bot.send_message(message.chat.id, "База слов слишком мала для генерации")
+                pass
         if not re.findall(link_pattern, message.text) and not re.findall(commands_pattern, message.text):
             await write_words(message.text, f"chats/{message.chat.id}.txt")
         
