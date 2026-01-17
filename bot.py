@@ -38,17 +38,32 @@ async def write_words(*args):
         text = text.replace("\n", ". ").replace("\n\n", ". ")
         await f.write(text + ",")
 
-async def gen(file):
+async def gen(file, chars=None, words=None):
     async with AIOFile(file, encoding="utf-8") as f:
         text = await f.read()
         text_model = [sample.strip() for sample in text.split(",")]
     generator = mc.PhraseGenerator(samples=text_model)
-    message = generator.generate_phrase(
-    validators=[
-        validators.words_count(minimal=4, maximal=10),
-        validators.chars_count(minimal=10, maximal=100),
-    ],
-    )
+    if chars is not None:
+        message = generator.generate_phrase(
+        attempts=5000,
+        validators=[
+            validators.chars_count(minimal=chars-10, maximal=chars+10),
+        ],
+        )
+    elif words is not None:
+        message = generator.generate_phrase(
+        attempts=5000,
+        validators=[
+            validators.words_count(minimal=words-1, maximal=words+1)
+        ],
+        )
+    else:
+        message = generator.generate_phrase(
+        validators=[
+            validators.words_count(minimal=4, maximal=10),
+            validators.chars_count(minimal=10, maximal=100),
+        ],
+        )
     return message
 
 # Объект бота
@@ -61,10 +76,17 @@ dp = Dispatcher()
 async def cmd_start(message: types.Message):
     await message.answer("Hello!")
 
-@dp.message(F.text.lower() == 'h j g')
+@dp.message(F.text.lower().contains('h j g'))
 async def force_generate(message: types.Message):
     try:
-        gen_message = await gen(f"chats/{message.chat.id}.txt")
+        if message.text.lower() != "h j g":
+            arg = message.text[6:]
+            if arg.isdigit() and int(arg) > 10:
+                gen_message = await gen(file=f"chats/{message.chat.id}.txt", count=int(arg))
+            elif arg == 'l':
+                gen_message = await gen(file=f"chats/{message.chat.id}.txt", words=30) 
+        else:
+            gen_message = await gen(file=f"chats/{message.chat.id}.txt")
         await bot.send_message(message.chat.id, gen_message)
     except:
         await bot.send_message(message.chat.id, "База слов слишком мала для генерации")
@@ -73,9 +95,9 @@ async def force_generate(message: types.Message):
 async def generate_poll(message: types.Message):
     await bot.send_poll(
         chat_id=message.chat.id,
-        question=await gen(f"chats/{message.chat.id}.txt"),
-        options=[await gen(f"chats/{message.chat.id}.txt"), await gen(f"chats/{message.chat.id}.txt"), await gen(f"chats/{message.chat.id}.txt"), await gen(f"chats/{message.chat.id}.txt")],
-        explanation=await gen(f"chats/{message.chat.id}.txt"),
+        question=await gen(file=f"chats/{message.chat.id}.txt"),
+        options=[await gen(file=f"chats/{message.chat.id}.txt"), await gen(file=f"chats/{message.chat.id}.txt"), await gen(file=f"chats/{message.chat.id}.txt"), await gen(file=f"chats/{message.chat.id}.txt")],
+        explanation=await gen(file=f"chats/{message.chat.id}.txt"),
         is_anonymous=False,
     )
 
