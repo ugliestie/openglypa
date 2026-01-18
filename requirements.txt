@@ -3,3 +3,4 @@ python-dotenv
 environs
 aiofile
 aiogram
+Pillow
