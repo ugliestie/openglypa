@@ -3,7 +3,7 @@ import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import Command
 from aiogram import F
-from aiogram.types import Message
+from aiogram.types import Message, BufferedInputFile
 from aiogram.filters import Command
 from aiofile import AIOFile
 import re
@@ -15,6 +15,9 @@ import mc
 from mc.builtin import validators
 
 import os
+
+from PIL import Image, ImageOps
+from io import BytesIO
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -66,12 +69,27 @@ async def gen(file, chars=None, words=None):
         )
     return message
 
-async def gen_topor(file):
-    async with AIOFile(file, encoding="utf-8") as f:
+async def gen_topor(path):
+    async with AIOFile(f"{path}/text.txt", encoding="utf-8") as f:
         text = await f.read()
         text_model = [sample.strip() for sample in text.split(",")]
     emojis = ['📣', '‼️', '❗️', '❓', '⚡️']
-    return str(random.choice(emojis) + ' ' + random.choice(text_model)[:random.randrange(2,8)])
+
+    async with AIOFile(f"{path}/photos.txt", encoding="utf-8") as f:
+        photos = await f.read()
+        photos_model = [sample for sample in photos.split(",") if sample != ""]
+
+    img = Image.open(await bot.download(file=f"{random.choice(photos_model)}"))
+    border = (random.randint(0, 250), random.randint(0, 200), random.randint(0, 250), random.randint(0, 200))
+    img = ImageOps.crop(img, border)
+    
+    byte_io = BytesIO()
+    byte_io.name = 'image.jpg'
+
+    img.save(byte_io, 'JPEG')
+    byte_io.seek(0)
+
+    return str(random.choice(emojis) + ' ' + random.choice(text_model)[:random.randrange(2,8)]), byte_io.read()
 
 # Объект бота
 bot = Bot(token=TOKEN)
@@ -89,13 +107,13 @@ async def force_generate(message: types.Message):
         if message.text.lower() != "h j g":
             arg = message.text[6:]
             if arg.isdigit() and int(arg) > 10:
-                gen_message = await gen(file=f"chats/{message.chat.id}.txt", count=int(arg))
+                gen_message = await gen(file=f"chats/{message.chat.id}/text.txt", count=int(arg))
             elif arg == 'l':
-                gen_message = await gen(file=f"chats/{message.chat.id}.txt", words=30) 
+                gen_message = await gen(file=f"chats/{message.chat.id}/text.txt", words=30) 
             else:
                 return
         else:
-            gen_message = await gen(file=f"chats/{message.chat.id}.txt")
+            gen_message = await gen(file=f"chats/{message.chat.id}/text.txt")
         await bot.send_message(message.chat.id, gen_message)
     except:
         await bot.send_message(message.chat.id, "База слов слишком мала для генерации")
@@ -104,32 +122,51 @@ async def force_generate(message: types.Message):
 async def generate_poll(message: types.Message):
     await bot.send_poll(
         chat_id=message.chat.id,
-        question=await gen(file=f"chats/{message.chat.id}.txt"),
-        options=[await gen(file=f"chats/{message.chat.id}.txt"), await gen(file=f"chats/{message.chat.id}.txt"), await gen(file=f"chats/{message.chat.id}.txt"), await gen(file=f"chats/{message.chat.id}.txt")],
-        explanation=await gen(file=f"chats/{message.chat.id}.txt"),
+        question=await gen(file=f"chats/{message.chat.id}/text.txt"),
+        options=[await gen(file=f"chats/{message.chat.id}/text.txt"), await gen(file=f"chats/{message.chat.id}/text.txt"), await gen(file=f"chats/{message.chat.id}/text.txt"), await gen(file=f"chats/{message.chat.id}/text.txt")],
+        explanation=await gen(file=f"chats/{message.chat.id}/text.txt"),
         is_anonymous=False,
     )
 
 @dp.message(F.text.lower() == 'h j t')
 async def generate_topor(message: types.Message):
-    await bot.send_message(message.chat.id, await gen_topor(f"chats/{message.chat.id}.txt"))
+    topor = await gen_topor(f"chats/{message.chat.id}")
+    await bot.send_photo(
+        chat_id=message.chat.id,
+        photo=BufferedInputFile(topor[1], filename="topor.jpg"),
+        caption=topor[0])
 
 
 @dp.message(F.text)
 async def any_message(message: Message):
     if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
+        if not os.path.exists(f"chats/{message.chat.id}"):
+            os.mkdir(f"chats/{message.chat.id}")
         if RANDOM_SEND and chance_hit(CHANCE):
             try:
                 if chance_hit(10):
-                    gen_message = await gen_topor(f"chats/{message.chat.id}.txt")
+                    topor = await gen_topor(f"chats/{message.chat.id}")
+                    await bot.send_photo(
+                        chat_id=message.chat.id,
+                        photo=BufferedInputFile(topor[1], filename="topor.jpg"),
+                        caption=topor[0])
                 else:
-                    gen_message = await gen(f"chats/{message.chat.id}.txt")
+                    gen_message = await gen(f"chats/{message.chat.id}/text.txt")
                 await bot.send_message(message.chat.id, gen_message)
             except:
                 pass
         if not re.findall(link_pattern, message.text) and not re.findall(commands_pattern, message.text):
-            await write_words(message.text, f"chats/{message.chat.id}.txt")
-        
+            await write_words(message.text, f"chats/{message.chat.id}/text.txt")
+
+@dp.message(F.photo)
+async def any_photo(message: Message):
+    if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
+        if not os.path.exists(f"chats/{message.chat.id}"):
+            os.mkdir(f"chats/{message.chat.id}")
+        async with AIOFile(f"chats/{message.chat.id}/photos.txt", "a", encoding="utf-8") as f:
+            await f.write(message.photo[-1].file_id + ",")
+    else:
+        return
 
 # Запуск процесса поллинга новых апдейтов
 async def main():
@@ -137,6 +174,4 @@ async def main():
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    if not os.path.exists("chats/"):
-        os.mkdir("chats/")
     asyncio.run(main())
