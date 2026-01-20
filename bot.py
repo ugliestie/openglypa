@@ -79,15 +79,16 @@ async def generate_poll_message(message: Message):
 @dp.message(F.text.lower() == 'h j t')
 async def generate_topor_message(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
-		if message.reply_to_message.photo:
-			if message.reply_to_message.caption:
-				logger.warning("happened")
-				topor = await generate_topor(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id), message.reply_to_message.caption.capitalize())
-			else:
-				topor = await generate_topor(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id))
-			await message.answer_photo(
-				photo=BufferedInputFile(topor[1], filename="topor.jpg"),
-				caption=topor[0])
+		if message.reply_to_message:
+			if message.reply_to_message.photo:
+				if message.reply_to_message.caption:
+					logger.warning("happened")
+					topor = await generate_topor(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id), message.reply_to_message.caption.capitalize())
+				else:
+					topor = await generate_topor(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id))
+				await message.answer_photo(
+					photo=BufferedInputFile(topor[1], filename="topor.jpg"),
+					caption=topor[0])
 		else:
 			topor = await generate_topor(message.chat.id, await random_image(message.chat.id))
 			await message.answer_photo(
@@ -100,10 +101,11 @@ async def generate_topor_message(message: Message):
 @dp.message(F.text.lower() == 'h j d')
 async def generate_demotivator_message(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
-		if message.reply_to_message.photo:
-			demotivator = await generate_demotivator(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id))
-			await message.answer_photo(
-				photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
+		if message.reply_to_message:
+			if message.reply_to_message.photo:
+				demotivator = await generate_demotivator(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id))
+				await message.answer_photo(
+					photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 		else:
 			demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id))
 			await message.answer_photo(
