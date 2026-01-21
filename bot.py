@@ -41,11 +41,12 @@ async def random_image(chat_id):
 # Хэндлер на команду /start
 @dp.message(Command("start"))
 async def cmd_start(message: Message):
-	await message.answer("Привет, я Openglypa! Я анализирую сообщения в групповом чате и генерирую на его основе контент. \nДобавь меня в групповой чат и я начну учиться вашей группе!")
+	await message.reply("Привет, я Openglypa! Я анализирую сообщения в групповом чате и генерирую на его основе контент. \nДобавь меня в групповой чат и я начну учиться вашей группе!")
 
 @dp.message(F.text.lower().startswith('h j g'))
 async def force_generate(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
+		await bot.send_chat_action(chat_id=message.chat.id, action="typing")
 		try:
 			if message.text.lower() != "h j g":
 				arg = message.text[6:]
@@ -57,17 +58,17 @@ async def force_generate(message: Message):
 					return
 			else:
 				gen_message = await generate_sentence(chat_id=message.chat.id)
-			await bot.send_message(message.chat.id, gen_message)
+			await message.reply(gen_message)
 		except:
-			await bot.send_message(message.chat.id, "База слов слишком мала для генерации")
+			await message.reply("База слов слишком мала для генерации")
 	else:
 		return
 
 @dp.message(F.text.lower() == 'h j p')
 async def generate_poll_message(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
-		await bot.send_poll(
-			chat_id=message.chat.id,
+		await bot.send_chat_action(chat_id=message.chat.id, action="typing")
+		await message.reply_poll(
 			question=await generate_sentence(message.chat.id),
 			options=await generate_sentences(message.chat.id, random.randint(3,6)),
 			explanation=await generate_sentence(message.chat.id),
@@ -79,19 +80,19 @@ async def generate_poll_message(message: Message):
 @dp.message(F.text.lower() == 'h j t')
 async def generate_topor_message(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
+		await bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
 		if message.reply_to_message:
 			if message.reply_to_message.photo:
 				if message.reply_to_message.caption:
-					logger.warning("happened")
 					topor = await generate_topor(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id), message.reply_to_message.caption.capitalize())
 				else:
 					topor = await generate_topor(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id))
-				await message.answer_photo(
+				await message.reply_photo(
 					photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 					caption=topor[0])
 		else:
 			topor = await generate_topor(message.chat.id, await random_image(message.chat.id))
-			await message.answer_photo(
+			await message.reply_photo(
 				photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 				caption=topor[0])
 	else:
@@ -101,14 +102,15 @@ async def generate_topor_message(message: Message):
 @dp.message(F.text.lower() == 'h j d')
 async def generate_demotivator_message(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
+		await bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
 		if message.reply_to_message:
 			if message.reply_to_message.photo:
 				demotivator = await generate_demotivator(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id))
-				await message.answer_photo(
+				await message.reply_photo(
 					photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 		else:
 			demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id))
-			await message.answer_photo(
+			await message.reply_photo(
 				photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 	else:
 		return
@@ -122,13 +124,12 @@ async def any_message(message: Message):
 			try:
 				if chance_hit(10):
 					topor = await generate_topor(message.chat.id, await random_image(message.chat.id))
-					await bot.send_photo(
-						chat_id=message.chat.id,
+					await message.answer_photo(
 						photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 						caption=topor[0])
 				else:
 					gen_message = await generate_sentence(message.chat.id)
-				await bot.send_message(message.chat.id, gen_message)
+				await message.answer(gen_message)
 			except:
 				pass
 		if not re.findall(link_pattern, message.text) and not re.findall(commands_pattern, message.text):
@@ -141,12 +142,14 @@ async def any_photo(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
 		await write_images(message.chat.id, message.photo[-1].file_id)
 		if message.caption == "h j d":
+			await bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
 			demotivator = await generate_demotivator(message.chat.id, await bot.download(file=message.photo[-1].file_id))
-			await message.answer_photo(
+			await message.reply_photo(
 				photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 		elif message.caption == "h j t":
+			await bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
 			topor = await generate_topor(message.chat.id, await bot.download(file=message.photo[-1].file_id))
-			await message.answer_photo(
+			await message.reply_photo(
 				photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 				caption=topor[0])
 	else:
