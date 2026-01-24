@@ -45,6 +45,17 @@ async def random_image(chat_id):
 async def cmd_start(message: Message):
 	await message.reply("Привет, я Openglypa! Я анализирую сообщения в групповом чате и генерирую на его основе контент. \nДобавь меня в групповой чат и я начну учиться вашей группе!")
 
+# Хэндлер на команду /start
+@dp.message(Command("help"))
+async def cmd_start(message: Message):
+	await message.reply("Справка Openglypa\n\n"
+						"h j g - генерация текста\n"
+						"h j p - генерация опросов\n"
+						"h j t - генерация Топор 1+ сообщения\n"
+						"h j d - генерация демотиватора\n"
+						"h j m - генрация мема из случайного шаблона\n"
+						"h j h - эта справка")
+
 @dp.message(F.text.lower().startswith('h j g'))
 async def force_generate(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
