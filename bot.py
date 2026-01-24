@@ -2,7 +2,7 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
-from aiogram.types import Message, BufferedInputFile
+from aiogram.types import Message, BufferedInputFile, CallbackQuery
 import random
 import os
 import re
@@ -13,6 +13,8 @@ from utils.topor import *
 from utils.images import *
 
 from utils.config import RANDOM_SEND, CHANCE, TOKEN
+
+from keyboards.settings import *
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -114,7 +116,54 @@ async def generate_demotivator_message(message: Message):
 				photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 	else:
 		return
+
+@dp.message(F.text.lower() == 'h j m')
+async def generate_meme_message(message: Message):
+	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
+		await bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
+		meme = await generate_meme(message.chat.id)
+		await message.reply_photo(
+			photo=BufferedInputFile(meme, filename="meme.jpg"))
+	else:
+		return
 	
+# TODO: настройки
+'''	
+@dp.message(F.text.lower() == 'h j s')
+async def cmd_settings(message: Message):
+    await message.reply(
+        "Настройки Openglypa",
+        reply_markup=kb_settings_main()
+    )
+
+@dp.callback_query(F.data == 'generate')
+async def process_callback_generate(callback: CallbackQuery):
+    await callback.message.edit_text(
+        text="Настройки генерации",
+        reply_markup=kb_settings_generate()
+    )
+
+@dp.callback_query(F.data == 'generate_learning')
+async def process_callback_generate_learning(callback: CallbackQuery):
+    await callback.message.edit_text(
+        text="Управление базами данных группы",
+        reply_markup=kb_settings_generate_learning()
+    )
+
+@dp.callback_query(F.data == 'generate_types')
+async def process_callback_generate_types(callback: CallbackQuery):
+    await callback.message.edit_text(
+        text="Настройки типов контента, который присылает бот",
+        reply_markup=kb_settings_generate_types()
+    )
+
+@dp.callback_query(F.data == 'settings')
+async def process_callback_settings(callback: CallbackQuery):
+    await callback.message.edit_text(
+        text="Настройки Openglypa",
+        reply_markup=kb_settings_main()
+    )
+'''	
 @dp.message(F.text)
 async def any_message(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
@@ -154,7 +203,7 @@ async def any_photo(message: Message):
 				caption=topor[0])
 	else:
 		return
-	
+
 # Запуск процесса поллинга новых апдейтов
 async def main():
 	await bot.delete_webhook(drop_pending_updates=True)
