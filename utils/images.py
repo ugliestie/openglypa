@@ -1,7 +1,9 @@
-from utils.text import generate_sentences
+from utils.text import generate_sentence, generate_sentences
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from io import BytesIO
-
+import random
+import textwrap
+from bot import random_image
 
 async def generate_demotivator(chat_id, image):
 	img = Image.new('RGB', (1280, 1124), color='#000000')
@@ -44,3 +46,47 @@ async def generate_demotivator(chat_id, image):
 	byte_io.seek(0)
 
 	return byte_io.read()
+
+async def generate_meme(chat_id):
+	select = random.randint(1, 2)
+
+	if select == 1:
+		img = Image.open("./utils/resources/templates/1.jpg")
+		text = await generate_sentence(chat_id=chat_id)
+
+		drawer = ImageDraw.Draw(img)
+		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 25, encoding='UTF-8')
+		image_width, image_height = img.size
+		y_text = 750
+		lines = textwrap.wrap(text, width=11)
+		for line in lines:
+			line_width = font.getbbox(line)[2]
+			line_height = font.getbbox(line)[3]
+			drawer.text((((image_width - line_width) / 2)-35, y_text), 
+					line, fill='white', font=font,
+       				stroke_width=2, stroke_fill='black')
+			y_text += line_height
+		
+		byte_io = BytesIO()
+		byte_io.name = 'image.jpg'
+		
+		img.save(byte_io, 'JPEG')
+		byte_io.seek(0)
+
+		return byte_io.read()
+	
+	if select == 2:
+		img = Image.open("./utils/resources/templates/2.jpg")
+		img_paste = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((639, 348))
+
+		img.paste(img_paste)
+		
+		byte_io = BytesIO()
+		byte_io.name = 'image.jpg'
+		
+		img.save(byte_io, 'JPEG')
+		byte_io.seek(0)
+
+		return byte_io.read()
+		
+	
