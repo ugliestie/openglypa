@@ -178,6 +178,8 @@ async def process_callback_settings(callback: CallbackQuery):
 @dp.message(F.text)
 async def any_message(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
+		if not os.path.exists("chats"):
+			os.mkdir(f"chats")
 		if not os.path.exists(f"chats/{message.chat.id}"):
 			os.mkdir(f"chats/{message.chat.id}")
 		if RANDOM_SEND and chance_hit(CHANCE):

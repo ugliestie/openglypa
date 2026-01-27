@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 from io import BytesIO
 import random
 import textwrap
-from bot import random_image
+from main import random_image
 
 async def generate_demotivator(chat_id, image):
 	img = Image.new('RGB', (1280, 1124), color='#000000')
@@ -48,7 +48,7 @@ async def generate_demotivator(chat_id, image):
 	return byte_io.read()
 
 async def generate_meme(chat_id):
-	select = random.randint(1, 2)
+	select = random.randint(1, 3)
 
 	if select == 1:
 		img = Image.open("./utils/resources/templates/1.jpg")
@@ -88,5 +88,52 @@ async def generate_meme(chat_id):
 		byte_io.seek(0)
 
 		return byte_io.read()
+
+	if select == 3:
+		img = Image.open("./utils/resources/templates/3.jpg")
+		text = await generate_sentences(chat_id=chat_id, count=3)
+
+		drawer = ImageDraw.Draw(img)
+		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 35, encoding='UTF-8')
+		image_width = 595
+
+		y_text = 205
+		lines = textwrap.wrap(text[0], width=33)
+		for line in lines:
+			line_width = font.getbbox(line)[2]
+			line_height = font.getbbox(line)[3]
+			drawer.text((((image_width - line_width) / 2), y_text), 
+					line, fill='white', font=font,
+					stroke_width=2, stroke_fill='black')
+			y_text += line_height
+
+		y_text = 430
+		lines = textwrap.wrap(text[1], width=20)
+		for line in lines:
+			line_width = font.getbbox(line)[2]
+			line_height = font.getbbox(line)[3]
+			drawer.text((((image_width - line_width) / 2)-125, y_text), 
+					line, fill='white', font=font,
+					stroke_width=2, stroke_fill='black')
+			y_text += line_height
+
+		y_text = 650
+		lines = textwrap.wrap(text[2], width=28)
+		if len(lines) != 1: y_text = 685
+		else: y_text = 713
+		for line in lines:
+			line_width = font.getbbox(line)[2]
+			line_height = font.getbbox(line)[3]
+			drawer.text((((image_width - line_width) / 2), y_text), 
+					line, fill='white', font=font,
+					stroke_width=2, stroke_fill='black')
+			y_text += line_height
+
+		byte_io = BytesIO()
+		byte_io.name = 'image.jpg'
 		
+		img.save(byte_io, 'JPEG')
+		byte_io.seek(0)
+
+		return byte_io.read()
 	
