@@ -19,6 +19,6 @@ async def generate_topor(chat_id, image, text=None):
 
 	if text is None:
 		text_model = await read_words(chat_id=chat_id)
-		return str(random.choice(emojis) + ' ' + random.choice(text_model)[:random.randrange(2,8)].capitalize()), byte_io.read()
-	else:
-		return str(random.choice(emojis) + ' ' + text[:random.randrange(2,8)].capitalize()), byte_io.read()
+		text = random.choice(text_model)
+	
+	return str(random.choice(emojis) + ' ' + text.split(' ', 1)[0].capitalize() + text.split(' ', 1)[1][:random.randrange(2,8)]), byte_io.read()
