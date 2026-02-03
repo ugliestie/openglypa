@@ -182,7 +182,7 @@ async def process_callback_generate_lazyness(callback: CallbackQuery, state: FSM
 	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		await callback.message.edit_text(
 			text="🥱 Управление ленью бота\n"
-				f"На данный момент бот ленится писать в {(await get_automatic_generations(callback.message.chat.id))[0]}% случаев"
+				f"На данный момент бот ленится писать в {(await get_automatic_generations(callback.message.chat.id))[0]}% случаев\n"
 				"Ответьте значением от 0 до 100 чтобы изменить лень бота в процентах\n",
 			reply_markup=kb_settings_generate_lazyness()
 		)
