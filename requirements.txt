@@ -4,4 +4,3 @@ environs
 aiofile
 aiogram
 Pillow
-sqlite3
