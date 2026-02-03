@@ -30,7 +30,7 @@ def kb_settings_generate_lazyness():
 def kb_settings_generate_types():
     inline_kb_list = [
         [InlineKeyboardButton(text="🔑 Команды", callback_data='generate_types_commands')],
-        [InlineKeyboardButton(text="🤖 Автоматиеский вызов", callback_data='generate_types_automatic')],
+        [InlineKeyboardButton(text="🤖 Автоматический вызов", callback_data='generate_types_automatic')],
         [InlineKeyboardButton(text="◀️ Назад", callback_data='generate')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
