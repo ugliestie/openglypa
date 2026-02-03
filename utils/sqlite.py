@@ -36,18 +36,18 @@ async def check_group(group_id):
         db.commit()
 
 async def get_commands_settings(group_id):
-    try:
-        return cur.execute('SELECT text, topor, demotivators, memes, polls FROM group_commands_settings WHERE group_id = ?', (group_id,)).fetchone()
-    except:
+    row = cur.execute('SELECT text, topor, demotivators, memes, polls FROM group_commands_settings WHERE group_id = ?', (group_id,)).fetchone()
+    if row is None:
         await check_group(group_id)
         return (1, 1, 1, 1, 1)
+    return row
 
 async def get_automatic_settings(group_id):
-    try:
-        return cur.execute('SELECT text, topor, demotivators, memes, polls FROM group_automatic_settings WHERE group_id = ?', (group_id,)).fetchone()
-    except:
+    row = cur.execute('SELECT text, topor, demotivators, memes, polls FROM group_automatic_settings WHERE group_id = ?', (group_id,)).fetchone()
+    if row is None:
         await check_group(group_id)
         return (1, 1, 1, 1, 1)
+    return row
 
 async def set_setting(type_setting, kind_setting, setting, group_id):
     if type_setting == "commands":
@@ -75,11 +75,11 @@ async def set_setting(type_setting, kind_setting, setting, group_id):
     db.commit()
 
 async def get_automatic_generations(group_id):
-    try:
-        return cur.execute('SELECT lazyness, text, topor, demotivators, memes, polls FROM group_automatic_settings WHERE group_id = ?', (group_id,)).fetchone()
-    except:
+    row = cur.execute('SELECT lazyness, text, topor, demotivators, memes, polls FROM group_automatic_settings WHERE group_id = ?', (group_id,)).fetchone()
+    if row is None:
         await check_group(group_id)
         return (95, 1, 1, 1, 1, 1)
+    return row
 
 async def update_lazyness(lazyness, group_id):
     cur.execute('UPDATE group_automatic_settings SET lazyness = ? WHERE group_id = ?', (lazyness, group_id))

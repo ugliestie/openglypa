@@ -52,7 +52,6 @@ async def random_image(chat_id):
 	return await bot.download(file=f"{random.choice(photos_model)}")
 
 async def is_message_admin(message: Message, user_id : int) -> bool:
-	logger.warning(user_id)
 	member = await message.bot.get_chat_member(message.chat.id, user_id)
 	return isinstance(member, ADMINS)
 
