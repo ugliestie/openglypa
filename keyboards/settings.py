@@ -1,41 +1,66 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from utils.sqlite import *
+
+def marker(flag):
+    if flag == 1:
+        return '✅'
+    else:
+        return '❌'
 
 def kb_settings_main():
     inline_kb_list = [
-        [InlineKeyboardButton(text="Генерация", callback_data='generate')],
-        [InlineKeyboardButton(text="Статистика", callback_data='statistics')]
+        [InlineKeyboardButton(text="Генерация", callback_data='generate')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
 
 def kb_settings_generate():
     inline_kb_list = [
-        [
-            InlineKeyboardButton(text="Обучение", callback_data='generate_learning'),
-            InlineKeyboardButton(text="Лень", callback_data='generate_lazyness')
-        ],
-        [InlineKeyboardButton(text="Типы контента", callback_data='generate_types')],
-        [InlineKeyboardButton(text="Назад", callback_data='settings')]
+        [InlineKeyboardButton(text="🥱 Лень", callback_data='generate_lazyness')],
+        [InlineKeyboardButton(text="🖌 Типы контента", callback_data='generate_types')],
+        [InlineKeyboardButton(text="◀️ Назад", callback_data='settings')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
 
-def kb_settings_generate_learning():
+def kb_settings_generate_lazyness():
     inline_kb_list = [
-        [InlineKeyboardButton(text="Удалить базу данных текста", callback_data='delete_text_db')],
-        [InlineKeyboardButton(text="Удалить базу данных изображений", callback_data='delete_images_db')],
-        [InlineKeyboardButton(text="Назад", callback_data='generate')]
+        [InlineKeyboardButton(text="◀️ Назад", callback_data='generate')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
 
 def kb_settings_generate_types():
     inline_kb_list = [
+        [InlineKeyboardButton(text="🔑 Команды", callback_data='generate_types_commands')],
+        [InlineKeyboardButton(text="🤖 Автоматиеский вызов", callback_data='generate_types_automatic')],
+        [InlineKeyboardButton(text="◀️ Назад", callback_data='generate')]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
+
+def kb_settings_generate_types_commands(settings):
+    inline_kb_list = [
         [
-            InlineKeyboardButton(text="Текст", callback_data='type_text'),
-            InlineKeyboardButton(text="Топор 1+", callback_data='type_topor')
+            InlineKeyboardButton(text=f"Текст | {marker(settings[0])}", callback_data='type_commands_text'),
+            InlineKeyboardButton(text=f"Топор 1+ | {marker(settings[1])}", callback_data='type_commands_topor')
         ],
         [
-            InlineKeyboardButton(text="Демотиваторы", callback_data='type_demotivators'),
-            InlineKeyboardButton(text="Мемы", callback_data='type_memes')
+            InlineKeyboardButton(text=f"Демотиваторы | {marker(settings[2])}", callback_data='type_commands_demotivators'),
+            InlineKeyboardButton(text=f"Мемы | {marker(settings[3])}", callback_data='type_commands_memes')
         ],
-        [InlineKeyboardButton(text="Назад", callback_data='generate')]
+        [InlineKeyboardButton(text=f"Опросы | {marker(settings[4])}", callback_data='type_commands_polls')],
+        [InlineKeyboardButton(text="◀️ Назад", callback_data='generate_types')]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
+
+def kb_settings_generate_types_automatic(settings):
+    inline_kb_list = [
+        [
+            InlineKeyboardButton(text=f"Текст | {marker(settings[0])}", callback_data='type_automatic_text'),
+            InlineKeyboardButton(text=f"Топор 1+ | {marker(settings[1])}", callback_data='type_automatic_topor')
+        ],
+        [
+            InlineKeyboardButton(text=f"Демотиваторы | {marker(settings[2])}", callback_data='type_automatic_demotivators'),
+            InlineKeyboardButton(text=f"Мемы | {marker(settings[3])}", callback_data='type_automatic_memes')
+        ],
+        [InlineKeyboardButton(text=f"Опросы | {marker(settings[4])}", callback_data='type_automatic_polls')],
+        [InlineKeyboardButton(text="◀️ Назад", callback_data='generate_types')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)

@@ -1,4 +1,5 @@
 chats/
+groups_settings.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
