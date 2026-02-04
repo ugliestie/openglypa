@@ -12,6 +12,8 @@ from main import random_image
 
 from keyboards.settings import kb_settings_main
 
+from main import logger
+
 router = Router()
 
 async def is_message_admin(message: Message, user_id : int) -> bool:
@@ -38,16 +40,20 @@ async def cmd_help(message: Message):
 @router.message(F.text.lower().startswith('h j g'))
 async def force_generate(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[0] == 1:
-		await message.bot.send_chat_action(chat_id=message.chat.id, action="typing")
 		try:
 			if message.text.lower() != "h j g":
 				arg = message.text[6:]
 				if arg.isdigit() and int(arg) > 10:
-					gen_message = await generate_sentence(chat_id=message.chat.id, count=int(arg))
+					await message.bot.send_chat_action(chat_id=message.chat.id, action="typing")
+					logger.warning(arg)
+					gen_message = await generate_sentence(chat_id=message.chat.id, chars_count=int(arg))
 				elif arg == 'l':
-					gen_message = await generate_sentence(chat_id=message.chat.id, words=30) 
-				else:
-					return
+					await message.bot.send_chat_action(chat_id=message.chat.id, action="typing")
+					gen_message = await generate_sentence(chat_id=message.chat.id, size=3)
+				"""else:
+					words = arg.lower().split(" ")
+					words.insert(0, "__start__")
+					gen_message = await generate_sentence(chat_id=message.chat.id, start=words)"""
 			else:
 				gen_message = await generate_sentence(chat_id=message.chat.id)
 			await message.reply(gen_message)

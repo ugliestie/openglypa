@@ -6,7 +6,7 @@ import os
 import re
 import random
 
-from utils.db import *
+from utils.chat_data import *
 from utils.sqlite import *
 from utils.text import *
 from utils.topor import *

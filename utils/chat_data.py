@@ -1,4 +1,5 @@
 from aiofile import AIOFile
+from pyutil import filereplace
 import os
 
 # Запись слов и выражений в файл, созданный под чат
@@ -33,3 +34,7 @@ async def read_images(chat_id):
 	async with AIOFile(f"chats/{chat_id}/images.txt", encoding="utf-8") as f:
 		images = await f.read()
 		return [sample for sample in images.split(",") if sample != ""]
+
+# Удаление из файла изображения, к которому невозможно получить доступ
+async def delete_image(file_id, chat_id):
+	filereplace(f"chats/{chat_id}/images.txt",f"{file_id},","")

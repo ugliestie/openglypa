@@ -1,6 +1,7 @@
-mc.py
 python-dotenv
 environs
 aiofile
 aiogram
 Pillow
+python-util
+

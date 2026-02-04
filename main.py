@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 import random
 
 from utils.sqlite import db_start
-from utils.db import read_images
+from utils.chat_data import read_images, delete_image
 
 from utils.config import TOKEN
 from handlers import commands, different_types, settings
@@ -21,7 +21,12 @@ dp = Dispatcher()
 
 async def random_image(chat_id):
 	photos_model = await read_images(chat_id)
-	return await bot.download(file=f"{random.choice(photos_model)}")
+	for attempt_number in range(3):
+		file_id = random.choice(photos_model)
+		try:
+			return await bot.download(file=file_id)
+		except:
+			await delete_image(file_id, chat_id)
 
 async def on_startup():
 	await db_start()
