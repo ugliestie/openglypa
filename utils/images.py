@@ -3,7 +3,12 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 from io import BytesIO
 import random
 import textwrap
-from main import random_image
+from utils.db import *
+from aiogram.types import Message
+
+async def random_image(message: Message, chat_id):
+	photos_model = await read_images(chat_id)
+	return await message.bot.download(file=f"{random.choice(photos_model)}")
 
 async def generate_demotivator(chat_id, image):
 	img = Image.new('RGB', (1280, 1124), color='#000000')
