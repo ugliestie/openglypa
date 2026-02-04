@@ -8,6 +8,8 @@ from utils.text import *
 from utils.topor import *
 from utils.images import *
 
+from main import random_image
+
 from keyboards.settings import kb_settings_main
 
 router = Router()
@@ -61,14 +63,14 @@ async def generate_topor_message(message: Message):
 		if message.reply_to_message:
 			if message.reply_to_message.photo:
 				if message.reply_to_message.caption:
-					topor = await generate_topor(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id), message.reply_to_message.caption.capitalize())
+					topor = await generate_topor(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id), message.reply_to_message.caption.capitalize())
 				else:
-					topor = await generate_topor(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id))
+					topor = await generate_topor(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id))
 				await message.reply_photo(
 					photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 					caption=topor[0])
 		else:
-			topor = await generate_topor(message.chat.id, await random_image(message, message.chat.id))
+			topor = await generate_topor(message.chat.id, await random_image(message.chat.id))
 			await message.reply_photo(
 				photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 				caption=topor[0])
@@ -82,11 +84,11 @@ async def generate_demotivator_message(message: Message):
 		await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
 		if message.reply_to_message:
 			if message.reply_to_message.photo:
-				demotivator = await generate_demotivator(message.chat.id, await bot.download(file=message.reply_to_message.photo[-1].file_id))
+				demotivator = await generate_demotivator(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id))
 				await message.reply_photo(
 					photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 		else:
-			demotivator = await generate_demotivator(message.chat.id, await random_image(message, message.chat.id))
+			demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id))
 			await message.reply_photo(
 				photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 	else:
