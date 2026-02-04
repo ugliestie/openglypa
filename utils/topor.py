@@ -1,4 +1,4 @@
-from utils.db import read_words
+from utils.chat_data import read_words
 from PIL import Image, ImageOps
 import random
 from io import BytesIO
