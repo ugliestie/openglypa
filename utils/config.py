@@ -3,6 +3,4 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-RANDOM_SEND = True if os.getenv("RANDOM_RULE") == "True" else False
-CHANCE = int(os.getenv("CHANCE"))
 TOKEN = os.getenv("TOKEN")
