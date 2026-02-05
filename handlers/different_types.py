@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import Message, BufferedInputFile
+from aiogram.types import Message, BufferedInputFile, ContentType as CT
 from aiogram.filters import StateFilter
 
 import os
@@ -60,21 +60,35 @@ async def any_message(message: Message):
 			await write_words(message.text, message.chat.id)
 	else:
 		return
-
-@router.message(F.photo)
-async def any_photo(message: Message):
+	
+@router.message(F.content_type.in_([CT.PHOTO, CT.VIDEO, CT.AUDIO, CT.DOCUMENT]))
+async def handle_albums(message: Message, album: list[Message]):
+	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
+		for msg in album:
+			if msg.photo:
+				await write_images(message.chat.id, msg.photo[-1].file_id)
+		if message.caption is not None:
+			await message.reply(message.caption)
+			await write_words(message.caption, message.chat.id)
+	else:
+		return
+	
+@router.message(F.content_type.in_([CT.PHOTO, CT.VIDEO, CT.AUDIO, CT.DOCUMENT]))
+async def handle_single_media(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
 		await write_images(message.chat.id, message.photo[-1].file_id)
 		if message.caption == "h j d":
-			await bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
+			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
 			demotivator = await generate_demotivator(message.chat.id, await bot.download(file=message.photo[-1].file_id))
 			await message.reply_photo(
 				photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 		elif message.caption == "h j t":
-			await bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
+			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
 			topor = await generate_topor(message.chat.id, await bot.download(file=message.photo[-1].file_id))
 			await message.reply_photo(
 				photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 				caption=topor[0])
+		elif message.caption is not None:
+			await write_words(message.caption, message.chat.id)
 	else:
 		return

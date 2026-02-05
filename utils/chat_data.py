@@ -2,6 +2,9 @@ from aiofile import AIOFile
 from pyutil import filereplace
 import os
 
+# Корпус данных чата устроен на основе логики NeuronBot
+# https://github.com/kesha1225/NeuronBot
+
 # Запись слов и выражений в файл, созданный под чат
 async def write_words(text, chat_id):
 	async with AIOFile(f"chats/{chat_id}/text.txt", "a", encoding="utf-8") as f:
