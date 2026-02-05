@@ -67,8 +67,8 @@ async def handle_albums(message: Message, album: list[Message]):
 		for msg in album:
 			if msg.photo:
 				await write_images(message.chat.id, msg.photo[-1].file_id)
-		if message.caption is not None:
-			await write_words(message.caption, message.chat.id)
+			if msg.caption is not None:
+				await write_words(message.caption, message.chat.id)
 	else:
 		return
 	
