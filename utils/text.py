@@ -13,6 +13,9 @@ def generate(samples, tries_count, size=None, chars_count=None, start=None):
 
 	if not samples:
 		return None
+	
+	if start is None:
+		samples.append(start)
 
 	for sample in samples:
 		words = sample.split(" ")
@@ -33,10 +36,7 @@ def generate(samples, tries_count, size=None, chars_count=None, start=None):
 				start_frames.append(frames[i + 1])
 
 	for i in range(tries_count):
-		if start is None:
-			result = [choice(start_frames)]
-		else:
-			result = start
+		result = [choice(start_frames)]
 
 		for frame in result:
 			next_frame = choice(frame_map[frame])
@@ -67,6 +67,9 @@ def generate(samples, tries_count, size=None, chars_count=None, start=None):
 						return str_result
 			elif chars_count is not None:
 				if chars_count-10 <= len(str_result) <= chars_count+10:
+					return str_result
+			elif start is not None:
+				if str_result.startswith(start):
 					return str_result
 
 	return None
