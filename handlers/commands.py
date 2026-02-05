@@ -20,18 +20,6 @@ async def is_message_admin(message: Message, user_id : int) -> bool:
 	member = await message.bot.get_chat_member(message.chat.id, user_id)
 	return isinstance(member, ADMINS)
 
-@router.chat_member()
-async def track_bot_membership(update: types.ChatMemberUpdated):
-    if update.new_chat_member.user.id == my_bot.id:
-        if update.new_chat_member.status in ['member', 'administrator']:
-            group_id = update.chat.id
-            if group_id not in group_list:
-                group_list.append(group_id)
-                print(f"Bot added to group: {group_id}")
-        elif update.new_chat_member.status == 'left':
-            if update.chat.id in group_list:
-                group_list.remove(update.chat.id)
-
 @router.message(Command("start"))
 async def cmd_start(message: Message):
 	if message.chat.type == 'private':
