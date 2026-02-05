@@ -3,7 +3,6 @@ from random import choice
 
 # Спасибо Witless за реализацию алгоритма Маркова! 
 # https://github.com/jieggii/witless/blob/master/api/generator/generator.pyx
-
 def generate(samples, tries_count, size=None, chars_count=None, start=None):
 	_start = "___start___"
 	_end = "___end___"
