@@ -14,7 +14,7 @@ def generate(samples, tries_count, size=None, chars_count=None, start=None):
 	if not samples:
 		return None
 	
-	if start is None:
+	if start is not None:
 		samples.append(start)
 
 	for sample in samples:
