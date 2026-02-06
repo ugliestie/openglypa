@@ -2,6 +2,8 @@ from aiogram import Router, F
 from aiogram.types import Message, BufferedInputFile, ContentType as CT
 from aiogram.filters import StateFilter
 
+from aiogram_media_group import media_group_handler
+
 import os
 import re
 import random
@@ -60,15 +62,16 @@ async def any_message(message: Message):
 			await write_words(message.text, message.chat.id)
 	else:
 		return
-	
-@router.message(F.content_type.in_([CT.PHOTO, CT.VIDEO, CT.AUDIO, CT.DOCUMENT]))
-async def handle_albums(message: Message, album: list[Message]):
-	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
-		for msg in album:
+
+@router.message(F.media_group_id, F.content_type.in_([CT.PHOTO, CT.VIDEO, CT.AUDIO, CT.DOCUMENT]))
+@media_group_handler
+async def handle_albums(group: list[Message]):
+	if (group[0].chat.type == 'group' or group[0].chat.type == 'supergroup') and group[0].from_user.is_bot is False:
+		for msg in group:
 			if msg.photo:
-				await write_images(message.chat.id, msg.photo[-1].file_id)
+				await write_images(group[0].chat.id, msg.photo[-1].file_id)
 			if msg.caption is not None:
-				await write_words(message.caption, message.chat.id)
+				await write_words(group[0].caption, group[0].chat.id)
 	else:
 		return
 	

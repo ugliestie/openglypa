@@ -2,6 +2,7 @@ python-dotenv
 environs
 aiofile
 aiogram
+aiogram-media-group
 Pillow
 python-util
 
