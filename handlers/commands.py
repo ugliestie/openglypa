@@ -138,7 +138,7 @@ async def generate_poll_message(message: Message):
 				is_anonymous=False,
 			)
 		except:
-			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я ничего не смог придумать опрос")
+			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я не смог придумать опрос")
 	else:
 		return
 
