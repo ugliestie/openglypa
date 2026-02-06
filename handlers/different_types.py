@@ -70,7 +70,7 @@ async def handle_albums(group: list[Message]):
 		for msg in group:
 			if msg.photo:
 				await write_images(group[0].chat.id, msg.photo[-1].file_id)
-			if msg.caption is not None:
+			if msg.caption is not None and not re.findall(link_pattern, msg.caption) and not re.findall(commands_pattern, msg.caption):
 				await write_words(group[0].caption, group[0].chat.id)
 	else:
 		return
@@ -78,19 +78,20 @@ async def handle_albums(group: list[Message]):
 @router.message(F.content_type.in_([CT.PHOTO, CT.VIDEO, CT.AUDIO, CT.DOCUMENT]))
 async def handle_single_media(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
-		await write_images(message.chat.id, message.photo[-1].file_id)
-		if message.caption == "h j d":
-			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
-			demotivator = await generate_demotivator(message.chat.id, await bot.download(file=message.photo[-1].file_id))
-			await message.reply_photo(
-				photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
-		elif message.caption == "h j t":
-			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
-			topor = await generate_topor(message.chat.id, await bot.download(file=message.photo[-1].file_id))
-			await message.reply_photo(
-				photo=BufferedInputFile(topor[1], filename="topor.jpg"),
-				caption=topor[0])
-		elif message.caption is not None:
+		if message.photo:
+			await write_images(message.chat.id, message.photo[-1].file_id)
+			if message.caption == "h j d":
+				await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
+				demotivator = await generate_demotivator(message.chat.id, await bot.download(file=message.photo[-1].file_id))
+				await message.reply_photo(
+					photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
+			elif message.caption == "h j t":
+				await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
+				topor = await generate_topor(message.chat.id, await bot.download(file=message.photo[-1].file_id))
+				await message.reply_photo(
+					photo=BufferedInputFile(topor[1], filename="topor.jpg"),
+					caption=topor[0])
+		if message.caption is not None and not re.findall(link_pattern, message.caption) and not re.findall(commands_pattern, message.caption):
 			await write_words(message.caption, message.chat.id)
 	else:
 		return
