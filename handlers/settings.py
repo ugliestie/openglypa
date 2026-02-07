@@ -37,6 +37,7 @@ async def process_callback_generate_lazyness(callback: CallbackQuery, state: FSM
 
 @router.message(Settings.waiting_for_lazyness)
 async def lazyness_chosen(message: Message, state: FSMContext):
+	await message.reply("trigger state")
 	if (message.text).isdigit and int(message.text) >= 0 and int(message.text) <= 100:
 		await update_lazyness(int(message.text), message.chat.id)
 		await message.reply(text="🥱 Лень бота изменена!",
@@ -96,6 +97,10 @@ async def process_callback_generate_types(callback: CallbackQuery):
 				await set_setting("automatic", "memes", not(setting[3]), callback.message.chat.id)
 			elif callback.data == "type_automatic_polls":
 				await set_setting("automatic", "polls", not(setting[4]), callback.message.chat.id)
+			elif callback.data == "type_automatic_reactions":
+				await set_setting("automatic", "reactions", not(setting[5]), callback.message.chat.id)
+			elif callback.data == "type_automatic_stickers":
+				await set_setting("automatic", "stickers", not(setting[6]), callback.message.chat.id)
 			await callback.message.edit_text(
 					text="⚙️ Настройки типов контента, который присылает бот автоматически",
 					reply_markup=kb_settings_generate_types_automatic(await get_automatic_settings(callback.message.chat.id))
