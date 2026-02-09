@@ -57,5 +57,5 @@ async def delete_image(file_id, chat_id):
 	filereplace(f"chats/{chat_id}/images.txt",f"{file_id},","")
 
 # Удаление из файла стикеров, к которому невозможно получить доступ
-async def delete_stickers(file_id, chat_id):
+async def delete_sticker(file_id, chat_id):
 	filereplace(f"chats/{chat_id}/stickers.txt",f"{file_id},","")
