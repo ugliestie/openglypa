@@ -37,7 +37,6 @@ async def process_callback_generate_lazyness(callback: CallbackQuery, state: FSM
 
 @router.message(Settings.waiting_for_lazyness)
 async def lazyness_chosen(message: Message, state: FSMContext):
-	await message.reply("trigger state")
 	if (message.text).isdigit and int(message.text) >= 0 and int(message.text) <= 100:
 		await update_lazyness(int(message.text), message.chat.id)
 		await message.reply(text="🥱 Лень бота изменена!",

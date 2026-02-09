@@ -2,6 +2,7 @@ from aiogram import Router, F
 from aiogram.types import Message, BufferedInputFile
 from aiogram.filters import Command
 from aiogram.utils.chat_member import ADMINS
+from aiogram.exceptions import TelegramBadRequest
 
 from utils.sqlite import *
 from utils.text import *
@@ -23,7 +24,7 @@ async def is_message_admin(message: Message, user_id : int) -> bool:
 @router.message(Command("start"))
 async def cmd_start(message: Message):
 	if message.chat.type == 'private':
-		await message.reply("Привет, я Openglypa! <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> Я анализирую сообщения в групповом чате и генерирую на его основе контент. \nДобавь меня в групповой чат и я начну учиться вашей группе!")
+		await message.reply("Привет, я Openglypa! <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> \nЯ анализирую сообщения в групповом чате и генерирую на его основе контент. \nДобавь меня в групповой чат и я начну учиться вашей группе!")
 	elif (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
 		await message.reply("Привет, я Openglypa! <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> \nЯ анализирую сообщения в групповом чате и генерирую на его основе контент. \nНастрой меня с помощью команды <code>h j s</code> и узнай мои команды с помощью команды <code>h j h</code>!")
 
@@ -88,6 +89,9 @@ async def generate_topor_message(message: Message):
 				await message.reply_photo(
 					photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 					caption=topor[0])
+		except TelegramBadRequest as e:
+			if "not enough rights" in str(e):
+				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу придумать из-за того, что мне нельзя отправлять изображе")
 		except:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я ничего не придума")
 	else:
@@ -108,6 +112,9 @@ async def generate_demotivator_message(message: Message):
 				demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id))
 				await message.reply_photo(
 					photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
+		except TelegramBadRequest as e:
+			if "not enough rights" in str(e):
+				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу надемотивировать из-за того, что мне нельзя отправлять изображения")
 		except:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я ничего не смог надемотивировать")
 	else:
@@ -121,6 +128,9 @@ async def generate_meme_message(message: Message):
 			meme = await generate_meme(message.chat.id)
 			await message.reply_photo(
 				photo=BufferedInputFile(meme, filename="meme.jpg"))
+		except TelegramBadRequest as e:
+			if "not enough rights" in str(e):
+				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу намемить из-за того, что мне нельзя отправлять изображения")
 		except:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я ничего не смог намемить")
 	else:
@@ -131,12 +141,29 @@ async def generate_poll_message(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[4] == 1:
 		try:
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="typing")
-			await message.reply_poll(
-				question=await generate_sentence(message.chat.id),
-				options=await generate_sentences(message.chat.id, random.randint(3,6)),
-				explanation=await generate_sentence(message.chat.id),
-				is_anonymous=False,
-			)
+			type_poll = random.choice(["quiz", "regular"])
+			count_options = random.randint(3,6)
+			if type_poll == "quiz":
+				await message.reply_poll(
+					question=await generate_sentence(message.chat.id),
+					options=await generate_sentences(message.chat.id, count_options),
+					type=type_poll,
+					explanation=await generate_sentence(message.chat.id),
+					correct_option_id=random.randint(0, count_options-1),
+					is_anonymous=random.choice([True, False]),
+				)
+			else:
+				await message.reply_poll(
+					question=await generate_sentence(message.chat.id),
+					options=await generate_sentences(message.chat.id, count_options),
+					type=type_poll,
+					is_anonymous=random.choice([True, False]),
+				)
+		except TelegramBadRequest as e:
+			if "not enough rights" in str(e):
+				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу намемить из-за того, что мне нельзя отправлять опросы")
+			else:
+				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я не смог придумать опрос")
 		except:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я не смог придумать опрос")
 	else:
@@ -144,13 +171,16 @@ async def generate_poll_message(message: Message):
 
 @router.message(F.text.lower() == 'h j s')
 async def cmd_settings(message: Message):
-	await check_group(message.chat.id)
-	if await is_message_admin(message, message.from_user.id):
-		await message.reply(
-			"⚙️ Настройки Openglypa",
-			reply_markup=kb_settings_main()
-		)
+	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[4] == 1:
+		await check_group(message.chat.id)
+		if await is_message_admin(message, message.from_user.id):
+			await message.reply(
+				"⚙️ Настройки Openglypa",
+				reply_markup=kb_settings_main()
+			)
+		else:
+			await message.reply(
+				"У вас недостаточно прав в чате, чтобы вызывать эту команду"
+			)
 	else:
-		await message.reply(
-			"У вас недостаточно прав в чате, чтобы вызывать эту команду"
-		)
+		return

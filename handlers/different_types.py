@@ -1,6 +1,7 @@
 from aiogram import Router, F
 from aiogram.types import Message, BufferedInputFile, ContentType as CT, ReactionTypeEmoji
 from aiogram.filters import StateFilter
+from aiogram.exceptions import TelegramBadRequest
 
 from aiogram_media_group import media_group_handler
 
@@ -57,18 +58,30 @@ async def handle_single(message: Message):
 					gen_message = await generate_sentence(message.chat.id)
 					await message.answer(gen_message)
 				elif choice == 2:
-					topor = await generate_topor(message.chat.id, await random_image(message, message.chat.id))
-					await message.answer_photo(
-						photo=BufferedInputFile(topor[1], filename="topor.jpg"),
-						caption=topor[0])
+					try:
+						topor = await generate_topor(message.chat.id, await random_image(message, message.chat.id))
+						await message.answer_photo(
+							photo=BufferedInputFile(topor[1], filename="topor.jpg"),
+							caption=topor[0])
+					except TelegramBadRequest as e:
+						if "not enough rights" in str(e):
+							await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу придумать из-за того, что мне нельзя отправлять изображе")
 				elif choice == 3:
-					demotivator = await generate_demotivator(message.chat.id, await random_image(message, message.chat.id))
-					await message.answer_photo(
-						photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
+					try:
+						demotivator = await generate_demotivator(message.chat.id, await random_image(message, message.chat.id))
+						await message.answer_photo(
+							photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
+					except TelegramBadRequest as e:
+						if "not enough rights" in str(e):
+							await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу надемотивировать из-за того, что мне нельзя отправлять изображения")
 				elif choice == 4:
-					meme = await generate_meme(message.chat.id)
-					await message.answer_photo(
-						photo=BufferedInputFile(meme, filename="meme.jpg"))
+					try:
+						meme = await generate_meme(message.chat.id)
+						await message.answer_photo(
+							photo=BufferedInputFile(meme, filename="meme.jpg"))
+					except TelegramBadRequest as e:
+						if "not enough rights" in str(e):
+							await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу намемить из-за того, что мне нельзя отправлять изображения")
 				elif choice == 5:
 					await message.answer_poll(
 					question=await generate_sentence(message.chat.id),
@@ -81,9 +94,16 @@ async def handle_single(message: Message):
 					react = ReactionTypeEmoji(emoji=random.choice(set_reactions))
 					await message.react([react])
 				elif choice == 7:
-					await message.answer_sticker(
-						sticker=random.choice(await read_stickers(message.chat.id))
-					)
+					try:
+						sticker = random.choice(await read_stickers(message.chat.id))
+						await message.answer_sticker(
+							sticker=sticker
+						)
+					except TelegramBadRequest as e:
+						if "not enough rights" not in str(e):
+							await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу прислать стикер из-за того, что мне нельзя их отправлять")
+						else:
+							await delete_sticker(sticker, message.chat.id)
 			except:
 				pass
 		
