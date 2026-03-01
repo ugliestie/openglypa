@@ -33,6 +33,8 @@ def generate(samples, tries_count, size=None, chars_count=None, start=None):
 
 	if start is not None:
 		start_before_last = start.split(" ")[:-1]
+	else:
+		start_before_last = None
 
 	for i in range(tries_count):
 		if start is not None:
