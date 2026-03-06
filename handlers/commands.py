@@ -47,13 +47,15 @@ async def cmd_help(message: Message):
 async def force_generate(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[0] == 1:
 		if message.reply_to_message:
-			if message.reply_to_message.caption:
-				gen_message = await generate_sentence(chat_id=message.chat.id, start=message.reply_to_message.caption)
-			elif message.reply_to_message.text:
-				gen_message = await generate_sentence(chat_id=message.chat.id, start=message.reply_to_message.text)
-			else:
+			begining = (message.reply_to_message.caption or message.reply_to_message.text)
+			if begining is None:
 				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Бот не смог найти текст чтобы его продолжить...")
 				return
+			gen_message = await generate_sentence(chat_id=message.chat.id, start=begining)
+			if gen_message is None:
+					await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji>  Бот не смог найти ничего подходящего с таким началом")
+					return
+			gen_message = gen_message.replace(begining, "... ", 1)
 		elif message.text.lower() != "h j g":
 			arg = message.text[6:]
 			if arg.isdigit() and int(arg) > 10:
