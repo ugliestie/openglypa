@@ -4,16 +4,10 @@ from aiogram.filters import Command
 from aiogram.utils.chat_member import ADMINS
 from aiogram.exceptions import TelegramBadRequest
 
-from utils.sqlite import *
-from utils.text import *
-from utils.topor import *
-from utils.images import *
-
-from main import random_image
+import random
 
 from keyboards.settings import kb_settings_main
-
-from main import logger
+from utils.sqlite import get_commands_settings
 
 router = Router()
 
@@ -45,6 +39,7 @@ async def cmd_help(message: Message):
 
 @router.message(F.text.lower().startswith('h j g'))
 async def force_generate(message: Message):
+	from utils.text import generate_sentence
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[0] == 1:
 		if message.reply_to_message:
 			begining = (message.reply_to_message.caption or message.reply_to_message.text)
@@ -60,7 +55,6 @@ async def force_generate(message: Message):
 			arg = message.text[6:]
 			if arg.isdigit() and int(arg) > 10:
 				await message.bot.send_chat_action(chat_id=message.chat.id, action="typing")
-				logger.warning(arg)
 				gen_message = await generate_sentence(chat_id=message.chat.id, chars_count=int(arg))
 			elif arg == 'l':
 				await message.bot.send_chat_action(chat_id=message.chat.id, action="typing")
@@ -82,6 +76,8 @@ async def force_generate(message: Message):
 
 @router.message(F.text.lower() == 'h j t')
 async def generate_topor_message(message: Message):
+	from utils.topor import generate_topor
+	from main import random_image
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[1] == 1:
 		try:
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
@@ -110,6 +106,8 @@ async def generate_topor_message(message: Message):
 # TODO: обрабатывать текст при ответе
 @router.message(F.text.lower() == 'h j d')
 async def generate_demotivator_message(message: Message):
+	from utils.images import generate_demotivator
+	from main import random_image
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[2] == 1:
 		try:
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
@@ -132,6 +130,7 @@ async def generate_demotivator_message(message: Message):
 
 @router.message(F.text.lower() == 'h j m')
 async def generate_meme_message(message: Message):
+	from utils.images import generate_meme
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[3] == 1:
 		try:
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
@@ -148,6 +147,7 @@ async def generate_meme_message(message: Message):
 
 @router.message(F.text.lower() == 'h j p')
 async def generate_poll_message(message: Message):
+	from utils.text import generate_sentence, generate_sentences
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[4] == 1:
 		try:
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="typing")
@@ -182,7 +182,6 @@ async def generate_poll_message(message: Message):
 @router.message(F.text.lower() == 'h j s')
 async def cmd_settings(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[4] == 1:
-		await check_group(message.chat.id)
 		if await is_message_admin(message, message.from_user.id):
 			await message.reply(
 				"⚙️ Настройки Openglypa",

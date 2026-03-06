@@ -9,12 +9,6 @@ import os
 import re
 import random
 
-from utils.chat_data import *
-from utils.sqlite import *
-from utils.text import *
-from utils.topor import *
-from utils.images import *
-
 router = Router()
 
 link_pattern = re.compile(
@@ -32,6 +26,7 @@ def chance_hit(percent):
 @router.message(StateFilter(None), F.media_group_id)
 @media_group_handler
 async def handle_albums(group: list[Message]):
+	from utils.chat_data import write_words, write_images
 	if (group[0].chat.type == 'group' or group[0].chat.type == 'supergroup') and group[0].from_user.is_bot is False:
 		for msg in group:
 			if msg.photo:
@@ -43,6 +38,12 @@ async def handle_albums(group: list[Message]):
 	
 @router.message(StateFilter(None))
 async def handle_single(message: Message):
+	from utils.sqlite import get_automatic_generations
+	from utils.images import generate_meme, generate_demotivator
+	from utils.topor import generate_topor
+	from utils.text import generate_sentence, generate_sentences
+	from utils.chat_data import read_stickers, write_words, write_images, write_stickers, delete_sticker
+	from main import random_image
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
 		if not os.path.exists("chats"):
 			os.mkdir(f"chats")
@@ -59,29 +60,26 @@ async def handle_single(message: Message):
 					await message.answer(gen_message)
 				elif choice == 2:
 					try:
-						topor = await generate_topor(message.chat.id, await random_image(message, message.chat.id))
+						topor = await generate_topor(message.chat.id, await random_image(message.chat.id))
 						await message.answer_photo(
 							photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 							caption=topor[0])
-					except TelegramBadRequest as e:
-						if "not enough rights" in str(e):
-							await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу придумать из-за того, что мне нельзя отправлять изображе")
+					except Exception as e:
+						await message.reply(str(e))
 				elif choice == 3:
 					try:
-						demotivator = await generate_demotivator(message.chat.id, await random_image(message, message.chat.id))
+						demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id))
 						await message.answer_photo(
 							photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
-					except TelegramBadRequest as e:
-						if "not enough rights" in str(e):
-							await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу надемотивировать из-за того, что мне нельзя отправлять изображения")
+					except Exception as e:
+						await message.reply(str(e))
 				elif choice == 4:
 					try:
 						meme = await generate_meme(message.chat.id)
 						await message.answer_photo(
 							photo=BufferedInputFile(meme, filename="meme.jpg"))
-					except TelegramBadRequest as e:
-						if "not enough rights" in str(e):
-							await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу намемить из-за того, что мне нельзя отправлять изображения")
+					except Exception as e:
+						await message.reply(str(e))
 				elif choice == 5:
 					await message.answer_poll(
 					question=await generate_sentence(message.chat.id),
