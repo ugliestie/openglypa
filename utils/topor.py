@@ -22,6 +22,6 @@ async def generate_topor(chat_id, image, text=None):
 		text = random.choice(text_model)
 	
 	if len(text.split(' ', 1)) != 1:
-		return str(random.choice(emojis) + ' ' + text.split(' ', 1)[0].capitalize() + text.split(' ', 1)[1][:random.randrange(2,8)]), byte_io.read()
+		return str(random.choice(emojis) + ' ' + text.split(' ', 1)[0].capitalize() + ' ' + text.split(' ', 1)[1][:random.randrange(2,8)]), byte_io.read()
 	else:
 		return str(random.choice(emojis) + ' ' + text.capitalize()), byte_io.read()
