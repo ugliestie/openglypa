@@ -14,15 +14,6 @@ async def generate_demotivator(chat_id, image):
 	https://github.com/Infqq/simpledemotivators/blob/main/simpledemotivators/Demotivator.py
 	'''
 
-	img = Image.new('RGB', (1280, 1124), color='#000000')
-	img_border = Image.new('RGB', (1060, 720), color='#000000')
-	border = ImageOps.expand(img_border, border=2, fill='#ffffff')
-
-	user_img = Image.open(image).convert("RGBA").resize((1050, 710))
-
-	img.paste(border, (111, 96))
-	img.paste(user_img, (118, 103))
-
 	img = Image.new('RGB', (1280, 1024), color='black')
 	img_border = Image.new('RGB', (1060, 720), color='#000000')
 	border = ImageOps.expand(img_border, border=2, fill='#ffffff')
