@@ -9,6 +9,11 @@ from utils.text import generate_sentence, generate_sentences
 from main import random_image
 
 async def generate_demotivator(chat_id, image):
+	'''
+	Для демотиваторов использовался код библиотеки simpledemotivators
+	https://github.com/Infqq/simpledemotivators/blob/main/simpledemotivators/Demotivator.py
+	'''
+
 	img = Image.new('RGB', (1280, 1124), color='#000000')
 	img_border = Image.new('RGB', (1060, 720), color='#000000')
 	border = ImageOps.expand(img_border, border=2, fill='#ffffff')
@@ -18,30 +23,43 @@ async def generate_demotivator(chat_id, image):
 	img.paste(border, (111, 96))
 	img.paste(user_img, (118, 103))
 
-	fontsize = 1
-
+	img = Image.new('RGB', (1280, 1024), color='black')
+	img_border = Image.new('RGB', (1060, 720), color='#000000')
+	border = ImageOps.expand(img_border, border=2, fill='#ffffff')
+	user_img = Image.open(image).convert("RGBA").resize((1050, 710))
+	(width, height) = user_img.size
+	img.paste(border, (111, 96))
+	img.paste(user_img, (118, 103))
 	drawer = ImageDraw.Draw(img)
-	font = ImageFont.truetype("./utils/resources/fonts/timesnewroman.ttf", fontsize, encoding='UTF-8')
-	
+
+	font_name = "./utils/resources/fonts/timesnewroman.ttf"
+	top_size = 80
+	bottom_size = 60
+
 	text = await generate_sentences(chat_id=chat_id, count=2)
 
-	if len(text[0]) <= 25:
-		img_fraction = 0.40
-	if len(text[0]) > 25:
-		img_fraction = 0.75
+	font_1 = ImageFont.truetype(font=font_name, size=top_size, encoding='UTF-8')
+	text_width = font_1.getlength(text[0])
 
-	while font.getbbox(text[0])[2] < img_fraction * img.size[0]:
-		fontsize += 1
-		font = ImageFont.truetype("./utils/resources/fonts/timesnewroman.ttf", fontsize, encoding='UTF-8')
-	fontsize -= 1
-	font = ImageFont.truetype("./utils/resources/fonts/timesnewroman.ttf", fontsize, encoding='UTF-8')
+	while text_width >= (width + 250) - 20:
+		font_1 = ImageFont.truetype(font=font_name, size=top_size, encoding='UTF-8')
+		text_width = font_1.getlength(text[0])
+		top_size -= 1
 
-	size_1 = drawer.textlength(f'{text[0]}', font=font)
-	drawer.text(((1280 - size_1) / 2, 880), f'{text[0]}', fill=(240, 230, 210), font=font)
+	font_2 = ImageFont.truetype(font=font_name, size=bottom_size, encoding='UTF-8')
+	text_width = font_2.getlength(text[1])
 
-	size_2 = drawer.textlength(f'{text[1]}', font=font)
-	drawer.text(((1280 - size_2) / 2, 1010), f'{text[1]}', fill=(240, 230, 210), font=font)
+	while text_width >= (width + 250) - 20:
+		font_2 = ImageFont.truetype(font=font_name, size=bottom_size, encoding='UTF-8')
+		text_width = font_2.getlength(text[1])
+		bottom_size -= 1
 
+	size_1 = drawer.textlength(text[0], font=font_1)
+	size_2 = drawer.textlength(text[1], font=font_2)
+
+	drawer.text(((1280 - size_1) / 2, 840), text[0], fill='white', font=font_1)
+	drawer.text(((1280 - size_2) / 2, 930), text[1], fill='white', font=font_2)
+	
 	byte_io = BytesIO()
 	byte_io.name = 'image.jpg'
 	
@@ -67,7 +85,7 @@ async def generate_meme(chat_id):
 			line_height = font.getbbox(line)[3]
 			drawer.text((((image_width - line_width) / 2)-35, y_text), 
 					line, fill='white', font=font,
-       				stroke_width=2, stroke_fill='black')
+	   				stroke_width=2, stroke_fill='black')
 			y_text += line_height
 		
 		byte_io = BytesIO()
