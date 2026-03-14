@@ -43,7 +43,7 @@ async def handle_single(message: Message):
 	from utils.topor import generate_topor
 	from utils.text import generate_sentence, generate_sentences
 	from utils.chat_data import read_stickers, write_words, write_images, write_stickers, delete_sticker
-	from main import random_image
+	from main import random_image, logger
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
 		if not os.path.exists("chats"):
 			os.mkdir(f"chats")
@@ -65,28 +65,31 @@ async def handle_single(message: Message):
 							photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 							caption=topor[0])
 					except Exception as e:
-						await message.reply(str(e))
+						logger.warning(f"Ошибка при автоматической генерации Топор 1+: {str(e)}")
 				elif choice == 3:
 					try:
 						demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id))
 						await message.answer_photo(
 							photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 					except Exception as e:
-						await message.reply(str(e))
+						logger.warning(f"Ошибка при автоматической генерации демотиватора: {str(e)}")
 				elif choice == 4:
 					try:
 						meme = await generate_meme(message.chat.id)
 						await message.answer_photo(
 							photo=BufferedInputFile(meme, filename="meme.jpg"))
 					except Exception as e:
-						await message.reply(str(e))
+						logger.warning(f"Ошибка при автоматической генерации мема: {str(e)}")
 				elif choice == 5:
-					await message.answer_poll(
-					question=await generate_sentence(message.chat.id),
-					options=await generate_sentences(message.chat.id, random.randint(3,6)),
-					explanation=await generate_sentence(message.chat.id),
-					is_anonymous=False,
-				)
+					try:
+						await message.answer_poll(
+						question=await generate_sentence(message.chat.id),
+						options=await generate_sentences(message.chat.id, random.randint(3,6)),
+						explanation=await generate_sentence(message.chat.id),
+						is_anonymous=False,
+						)
+					except Exception as e:
+						logger.warning(f"Ошибка при автоматической генерации опроса: {str(e)}")
 				elif choice == 6:
 					set_reactions = ["❤", "👍", "👎", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"]
 					react = ReactionTypeEmoji(emoji=random.choice(set_reactions))
@@ -98,8 +101,8 @@ async def handle_single(message: Message):
 							sticker=sticker
 						)
 					except TelegramBadRequest as e:
-						if "not enough rights" not in str(e):
-							await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу прислать стикер из-за того, что мне нельзя их отправлять")
+						if "not enough rights" in str(e):
+							await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> <b>Я не могу прислать стикер из-за того, что мне нельзя их отправлять.</b><br><br>Я больше не буду пытаться. Чтобы исправить это, разрешите боту присылать стикеры и в настройках бота включите их автоматическое присылание.")
 						else:
 							await delete_sticker(sticker, message.chat.id)
 			except:
