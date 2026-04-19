@@ -35,6 +35,7 @@ async def cmd_help(message: Message):
 						"""<code>h j d</code> - генерация демотиватора\n"""
 						"""<code>h j m</code> - генрация мема из случайного шаблона\n"""
 						"""<code>h j s</code> - настройки бота\n"""
+						"""<code>h j stats</code> - статистика базы данных чата\n"""
 						"""<code>h j h</code> - эта справка""")
 
 @router.message(F.text.lower().startswith('h j g'))
@@ -191,5 +192,33 @@ async def cmd_settings(message: Message):
 			await message.reply(
 				"У вас недостаточно прав в чате, чтобы вызывать эту команду"
 			)
+	else:
+		return
+
+@router.message(F.text.lower() == 'h j stats')
+async def cmd_settings(message: Message):
+	from utils.chat_data import read_words, read_images, read_stickers
+	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
+		chat_id = message.chat.id
+  
+		try:
+			samples = len(await read_words(chat_id))
+		except:
+			samples = 0
+   
+		try:
+			images = len(await read_images(chat_id))
+		except:
+			images = 0
+   
+		try:
+			stickers = len(await read_stickers(chat_id))
+		except:
+			stickers = 0
+   
+		await message.reply("""<b>Статистика Openglypa <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji></b>\n\n"""
+						f"""Количество сообщений в базе данных: {samples}\n"""
+						f"""Количество изображений в базе данных: {images}\n"""
+						f"""Количество стикеров в базе данных: {stickers}""")
 	else:
 		return

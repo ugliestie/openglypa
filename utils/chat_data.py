@@ -19,7 +19,7 @@ async def write_images(*args):
 	async with AIOFile(f"chats/{chat_id}/images.txt", "a", encoding="utf-8") as f:
 		await f.write(file_id + ",")
 
-# Запись file_id стикеров в файл, созданный под чат (сами изображения обрабатываются только при использовании команд и не используют лишнее место на диске)
+# Запись file_id стикеров в файл, созданный под чат
 async def write_stickers(*args):
 	chat_id, file_id = args
 	if not os.path.exists(f"chats/{chat_id}"):
