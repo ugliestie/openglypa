@@ -109,10 +109,14 @@ async def generate_demotivator_message(message: Message):
 		try:
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
 			if message.reply_to_message:
-					if message.reply_to_message.photo:
-						demotivator = await generate_demotivator(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id))
-						await message.reply_photo(
-							photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
+				if message.reply_to_message.photo:
+					demotivator = await generate_demotivator(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id))
+					await message.reply_photo(
+						photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
+				else:
+					demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id))
+					await message.reply_photo(
+						photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 			else:
 				demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id))
 				await message.reply_photo(
