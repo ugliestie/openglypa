@@ -35,6 +35,7 @@ async def cmd_help(message: Message):
 						"""<code>h j d</code> - генерация демотиватора\n"""
 						"""<code>h j m</code> - генрация мема из случайного шаблона\n"""
 						"""<code>h j s</code> - настройки бота\n"""
+						"""<code>h j del</code> - удалить изображение/стикер из базы данных бота\n"""
 						"""<code>h j stats</code> - статистика базы данных чата\n"""
 						"""<code>h j h</code> - эта справка""")
 
@@ -82,15 +83,11 @@ async def generate_topor_message(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[1] == 1:
 		try:
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
-			if message.reply_to_message:
-				if message.reply_to_message.photo:
-					if message.reply_to_message.caption:
-						topor = await generate_topor(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id), message.reply_to_message.caption.capitalize())
-					else:
-						topor = await generate_topor(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id))
-					await message.reply_photo(
-						photo=BufferedInputFile(topor[1], filename="topor.jpg"),
-						caption=topor[0])
+			if message.reply_to_message.photo and message.reply_to_message.caption:
+				topor = await generate_topor(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id), message.reply_to_message.caption.capitalize())
+				await message.reply_photo(
+					photo=BufferedInputFile(topor[1], filename="topor.jpg"),
+					caption=topor[0])
 			else:
 				topor = await generate_topor(message.chat.id, await random_image(message.chat.id))
 				await message.reply_photo(
@@ -104,7 +101,6 @@ async def generate_topor_message(message: Message):
 	else:
 		return
 
-# TODO: обрабатывать текст при ответе
 @router.message(F.text.lower() == 'h j d')
 async def generate_demotivator_message(message: Message):
 	from utils.images import generate_demotivator
@@ -113,10 +109,10 @@ async def generate_demotivator_message(message: Message):
 		try:
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
 			if message.reply_to_message:
-				if message.reply_to_message.photo:
-					demotivator = await generate_demotivator(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id))
-					await message.reply_photo(
-						photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
+					if message.reply_to_message.photo:
+						demotivator = await generate_demotivator(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id))
+						await message.reply_photo(
+							photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 			else:
 				demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id))
 				await message.reply_photo(
@@ -188,6 +184,29 @@ async def cmd_settings(message: Message):
 				"⚙️ Настройки Openglypa",
 				reply_markup=kb_settings_main()
 			)
+		else:
+			await message.reply(
+				"У вас недостаточно прав в чате, чтобы вызывать эту команду"
+			)
+	else:
+		return
+
+# TODO: добавить банлист для стикеров
+@router.message(F.text.lower() == 'h j del')
+async def cmd_settings(message: Message):
+	from utils.chat_data import delete_image, delete_sticker
+	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
+		if await is_message_admin(message, message.from_user.id):
+			if message.photo:
+				await delete_image(message.photo.file_id, message.chat.id)
+				await message.reply(
+					"Изображение удалено из базы данных бота"
+				)
+			elif message.sticker:
+				await delete_sticker(message.sticker.file_id, message.chat.id)
+				await message.reply(
+					"Стикер удалён из базы данных бота"
+				)
 		else:
 			await message.reply(
 				"У вас недостаточно прав в чате, чтобы вызывать эту команду"
