@@ -27,7 +27,7 @@ async def generate_demotivator(chat_id, image):
 	top_size = 80
 	bottom_size = 60
 
-	text = await generate_sentences(chat_id=chat_id, count=2)
+	text = await generate_sentences(chat_id=chat_id, count=2, size=3)
 
 	font_1 = ImageFont.truetype(font=font_name, size=top_size, encoding='UTF-8')
 	text_width = font_1.getlength(text[0])
@@ -60,7 +60,7 @@ async def generate_demotivator(chat_id, image):
 	return byte_io.read()
 
 async def generate_meme(chat_id):
-	select = random.randint(1, 16)
+	select = random.randint(19, 20)
 
 	if select == 1:
 		img = Image.open("./utils/resources/templates/1.jpg")
@@ -507,6 +507,104 @@ async def generate_meme(chat_id):
 		byte_io.name = 'image.png'
 		
 		img.save(byte_io, 'PNG')
+		byte_io.seek(0)
+
+		return byte_io.read()
+
+	if select == 17:
+		img = Image.open("./utils/resources/templates/17.jpg")
+		img_paste = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((355, 355))
+
+		img.paste(img_paste, (-81, 201))
+  
+		byte_io = BytesIO()
+		byte_io.name = 'image.jpg'
+		
+		img.save(byte_io, 'JPEG')
+		byte_io.seek(0)
+
+		return byte_io.read()
+
+	if select == 18:
+		img = Image.open("./utils/resources/templates/18.png")
+	
+		drawer = ImageDraw.Draw(img)
+		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 50, encoding='UTF-8')
+		image_width = img.size[0]
+		text = await generate_sentence(chat_id=chat_id, size=2)
+		
+		y_text = 320
+		lines = textwrap.wrap(text, width=20)
+		for line in lines:
+			line_width = font.getbbox(line)[2]
+			line_height = font.getbbox(line)[3]
+			drawer.text((((image_width - line_width) / 2)-25, y_text), 
+					line, fill='black', font=font)
+			y_text += line_height
+   
+		byte_io = BytesIO()
+		byte_io.name = 'image.png'
+		
+		img.save(byte_io, 'PNG')
+		byte_io.seek(0)
+
+		return byte_io.read()
+
+	if select == 19:
+		img = Image.open("./utils/resources/templates/19.jpg")
+	
+		drawer = ImageDraw.Draw(img)
+		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 45, encoding='UTF-8')
+		image_width = img.size[0]
+		text = await generate_sentences(chat_id=chat_id, count=2)
+
+		y_text = 120
+		lines = textwrap.wrap(text[0], width=29)
+		for line in lines:
+			line_width = font.getbbox(line)[2]
+			line_height = font.getbbox(line)[3]
+			drawer.text((((image_width - line_width) / 2), y_text), 
+					line, fill='white', stroke_width=2, stroke_fill='black', font=font)
+			y_text += line_height
+
+		y_text = 523
+		lines = textwrap.wrap(text[1], width=40)
+		for line in lines:
+			line_width = font.getbbox(line)[2]
+			line_height = font.getbbox(line)[3]
+			drawer.text((((image_width - line_width) / 2), y_text), 
+					line, fill='white', stroke_width=2, stroke_fill='black', font=font)
+			y_text += line_height
+   
+		byte_io = BytesIO()
+		byte_io.name = 'image.jpg'
+		
+		img.save(byte_io, 'JPEG')
+		byte_io.seek(0)
+
+		return byte_io.read()
+   
+	if select == 20:
+		img = Image.open("./utils/resources/templates/20.jpg")
+	
+		drawer = ImageDraw.Draw(img)
+		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 40, encoding='UTF-8')
+		image_width = img.size[0]
+		text = await generate_sentence(chat_id=chat_id)
+	
+		y_text = 230
+		lines = textwrap.wrap(text, width=25)
+		for line in lines:
+			line_width = font.getbbox(line)[2]
+			line_height = font.getbbox(line)[3]
+			drawer.text((((image_width - line_width) / 2)-135, y_text), 
+					line, fill='white', stroke_width=2, stroke_fill='black', font=font)
+			y_text += line_height
+   
+		byte_io = BytesIO()
+		byte_io.name = 'image.jpg'
+		
+		img.save(byte_io, 'JPEG')
 		byte_io.seek(0)
 
 		return byte_io.read()

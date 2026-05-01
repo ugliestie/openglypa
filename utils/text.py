@@ -99,8 +99,12 @@ def generate(samples, tries_count, size=None, chars_count=None, start=None):
 					elif size == 2:  # medium
 						if 4 <= len(result) <= 7:
 							return str_result
-
-					elif size == 3:  # large
+   
+					elif size == 3:  # small + medium для демотиваторов
+						if 2 <= len(result) <= 7:
+							return str_result
+   
+					elif size == 4:  # large
 						if len(result) >= 30:
 							return str_result
 				elif chars_count is not None:
@@ -124,7 +128,7 @@ async def generate_sentence(chat_id, size=None, chars_count=None, start=None):
 		message = generate(samples=text_model, tries_count=5000, size=0)
 	return message
 
-async def generate_sentences(chat_id, count):
+async def generate_sentences(chat_id, count, size=0):
 	text_model = await read_words(chat_id=chat_id)
-	messages = [generate(samples=text_model, tries_count=5000, size=0) for x in range(count)]
+	messages = [generate(samples=text_model, tries_count=5000, size=size) for x in range(count)]
 	return messages

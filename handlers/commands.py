@@ -60,7 +60,7 @@ async def force_generate(message: Message):
 				gen_message = await generate_sentence(chat_id=message.chat.id, chars_count=int(arg))
 			elif arg == 'l':
 				await message.bot.send_chat_action(chat_id=message.chat.id, action="typing")
-				gen_message = await generate_sentence(chat_id=message.chat.id, size=3)
+				gen_message = await generate_sentence(chat_id=message.chat.id, size=4)
 			else:
 				await message.bot.send_chat_action(chat_id=message.chat.id, action="typing")
 				gen_message = await generate_sentence(chat_id=message.chat.id, start=arg.lower())
