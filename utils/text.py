@@ -9,7 +9,7 @@ def generate(samples, tries_count, size=None, chars_count=None, start=None):
 	frames = []
 	start_frames = []
 	frame_map = {}
-
+ 
 	if not samples:
 		return None
 
@@ -20,13 +20,6 @@ def generate(samples, tries_count, size=None, chars_count=None, start=None):
 			frames.append(word.lower())
 		frames.append(_end)
 
-	if start is not None:
-		start_before_last = start.split(" ")[:-1]
-		if start.split(" ")[-1] not in frames:
-			return None
-	else:
-		start_before_last = None
-
 	for i in range(len(frames)):
 		if frames[i] != _end:
 			try:
@@ -36,83 +29,56 @@ def generate(samples, tries_count, size=None, chars_count=None, start=None):
 				frame_map[frames[i]] = [frames[i + 1]]
 
 			if frames[i] == _start:
-				if start:
-					if frames[i + 1].startswith(start.split(" ")[-1]):
-						start_frames.append(frames[i + 1])
-				else:
-					start_frames.append(frames[i + 1])
-     
-	if not start_frames:
-		return None
+				start_frames.append(frames[i + 1])
 
-	if start:
-		for start_frame in start_frames:
-			for i in range(tries_count):
-				if start is not None:
-					result = [start_frame]
-				else:
-					result = [choice(start_frames)]
+	if start is not None:
+		start_before_last = start.split(" ")[:-1]
 
-				for frame in result:
-					next_frame = choice(frame_map[frame])
-					if next_frame == _end:
-						break
-					else:
-						result.append(next_frame)
+	for i in range(tries_count):
+		if start is not None:
+			result = [start.split(" ")[-1]]
+		else:
+			result = [choice(start_frames)]
 
-				if start_before_last:
-					result[:0] = start_before_last
-
-				str_result = " ".join(result)
-
-				if str_result not in samples and str_result != start_frame:
-					return str_result	
-	else:
-		for i in range(tries_count):
-			if start is not None:
-				result = [start.split(" ")[-1]]
+		for frame in result:
+			next_frame = choice(frame_map[frame])
+			if next_frame == _end:
+				break
 			else:
-				result = [choice(start_frames)]
+				result.append(next_frame)
 
-			for frame in result:
-				next_frame = choice(frame_map[frame])
-				if next_frame == _end:
-					break
-				else:
-					result.append(next_frame)
+		if start_before_last:
+			result[:0] = start_before_last
 
-			if start_before_last:
-				result[:0] = start_before_last
+		str_result = " ".join(result)
 
-			str_result = " ".join(result)
+		if str_result not in samples and str_result != start:
+			if size is not None:
+				if size == 0: # any
+					if len(result) <= 100:
+						return str_result
 
-			if str_result not in samples and str_result != start:
-				if size is not None:
-					if size == 0: # any
-						if len(result) <= 100:
-							return str_result
+				if size == 1:  # small
+					if 2 <= len(result) <= 3:
+						return str_result
 
-					if size == 1:  # small
-						if 2 <= len(result) <= 3:
-							return str_result
-
-					elif size == 2:  # medium
-						if 4 <= len(result) <= 7:
-							return str_result
-   
-					elif size == 3:  # small + medium для демотиваторов
+				elif size == 2:  # medium
+					if 4 <= len(result) <= 7:
+						return str_result
+  
+				elif size == 3:  # small + medium для демотиваторов
 						if 2 <= len(result) <= 7:
 							return str_result
-   
-					elif size == 4:  # large
-						if len(result) >= 30:
-							return str_result
-				elif chars_count is not None:
-					if chars_count-10 <= len(str_result) <= chars_count+10:
+
+				elif size == 4:  # large
+					if len(result) >= 30:
 						return str_result
-				elif start is not None:
-					if str_result.startswith(start):
-						return str_result
+			elif chars_count is not None:
+				if chars_count-10 <= len(str_result) <= chars_count+10:
+					return str_result
+			elif start is not None:
+				if str_result.startswith(start):
+					return str_result
 
 	return None
 
