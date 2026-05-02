@@ -17,7 +17,7 @@
 `h j p` - генерация опроса или викторины
 `h j t` - генерация сообщения в стиле [телеграм-канала Топор 1+](https://t.me/topor1plus)
 `h j d` - генерация демотиватора из случайного изображения, сохранённого в чате
-`h j m` - генерация случайного мема (посмотреть все шаблоны можно в [utils/resources/templates](utils/resources/templates))
+`h j m` - генерация случайного мема (посмотреть все шаблоны можно в [utils/resources/templates](https://github.com/ugliestie/openglypa/tree/main/utils/resources/templates))
 
 ## Настройки бота
 
