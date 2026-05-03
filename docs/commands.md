@@ -49,7 +49,8 @@
   <img width="487" height="155" alt="image" src="https://github.com/user-attachments/assets/dbf34e65-ab11-4218-b040-2a863a2571ae" />
   Настройка лени бота, автоматическая работа бота настроена так что бот в 95% ленится писать сам, если кто-то написал в чате. Это можно изменить, отправив число от 0 до 100.</br> </br> 
 
-  <img width="482" height="234" alt="image" src="https://github.com/user-attachments/assets/f7ffc1c8-cb7c-426a-b021-b1f046c02f85" />
+  <img width="477" height="179" alt="image" src="https://github.com/user-attachments/assets/a337c6a3-e38c-49c7-b43c-78ecf0d3a115" />
+
   В "Типы контента" можно выбрать можно какие команды бота можно использовать в чате, а в "Автоматический вызов" - какой контент он будет генерировать самостоятельно </br> </br> 
 </div>
 
