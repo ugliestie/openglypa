@@ -114,12 +114,12 @@ async def handle_single(message: Message):
 			await write_images(message.chat.id, message.photo[-1].file_id)
 			if message.caption == "h j d":
 				await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
-				demotivator = await generate_demotivator(message.chat.id, await bot.download(file=message.photo[-1].file_id))
+				demotivator = await generate_demotivator(message.chat.id, await message.bot.download(file=message.photo[-1].file_id))
 				await message.reply_photo(
 					photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 			elif message.caption == "h j t":
 				await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
-				topor = await generate_topor(message.chat.id, await bot.download(file=message.photo[-1].file_id))
+				topor = await generate_topor(message.chat.id, await message.bot.download(file=message.photo[-1].file_id))
 				await message.reply_photo(
 					photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 					caption=topor[0])
