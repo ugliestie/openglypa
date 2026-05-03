@@ -1,3 +1,5 @@
+<div align="center"><img width="150" alt="yayyy catears" src="https://github.com/user-attachments/assets/ffa8c735-8ddc-4d45-86d8-325f20a945f5" /></div>
+
 # Openglypa
 
 Telegram-бот, генерирующий контент на основе сообщений других пользователей в чате, используя цепь Маркова
