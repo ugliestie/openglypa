@@ -81,7 +81,6 @@ def generate(samples, tries_count, size=None, chars_count=None, start=None):
 				result[:0] = [start] ## Добавление всей стратовой строки к массиву результата
 
 				str_result = " ".join(result)
-				print(str_result)
     
 				if size is not None:
 					if size == 0: # any
