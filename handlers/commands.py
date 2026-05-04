@@ -83,11 +83,17 @@ async def generate_topor_message(message: Message):
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[1] == 1:
 		try:
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
-			if message.reply_to_message.photo and message.reply_to_message.caption:
-				topor = await generate_topor(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id), message.reply_to_message.caption.capitalize())
-				await message.reply_photo(
-					photo=BufferedInputFile(topor[1], filename="topor.jpg"),
-					caption=topor[0])
+			if message.reply_to_message:
+				if message.reply_to_message.photo and message.reply_to_message.caption:
+					topor = await generate_topor(message.chat.id, await message.bot.download(file=message.reply_to_message.photo[-1].file_id), message.reply_to_message.caption.capitalize())
+					await message.reply_photo(
+						photo=BufferedInputFile(topor[1], filename="topor.jpg"),
+						caption=topor[0])
+				else:
+					topor = await generate_topor(message.chat.id, await random_image(message.chat.id))
+					await message.reply_photo(
+						photo=BufferedInputFile(topor[1], filename="topor.jpg"),
+						caption=topor[0])
 			else:
 				topor = await generate_topor(message.chat.id, await random_image(message.chat.id))
 				await message.reply_photo(
