@@ -60,7 +60,7 @@ async def generate_demotivator(chat_id, image):
 	return byte_io.read()
 
 async def generate_meme(chat_id):
-	select = random.randint(1, 22)
+	select = random.randint(22, 22)
 
 	if select == 1:
 		img = Image.open("./utils/resources/templates/1.jpg")
@@ -650,16 +650,17 @@ async def generate_meme(chat_id):
 
 		drawer = ImageDraw.Draw(img)
 		font = ImageFont.truetype("./utils/resources/fonts/timesnewroman.ttf", 35, encoding='UTF-8')
+		font_title = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 60, encoding='UTF-8')
 		image_width, image_height = img.size
 		text = await generate_sentences(chat_id=chat_id, count=7, size=2)
 
 		y_text = 8
 		lines = textwrap.wrap(text[0]+"?", width=30)
 		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)-150, y_text),
-					line, fill='black', font=ImageFont.truetype("./utils/resources/fonts/impact.ttf", 60, encoding='UTF-8'))
+			line_width = font_title.getbbox(line)[2]
+			line_height = font_title.getbbox(line)[3]
+			drawer.text((((image_width - line_width) / 2), y_text),
+					line, fill='black', font=font_title)
 			y_text += line_height
 
 		y_text = 122
@@ -687,7 +688,7 @@ async def generate_meme(chat_id):
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)+250, y_text),
+			drawer.text((((image_width - line_width) / 2)+245, y_text),
 					line, fill='white', font=font,
 					stroke_width=2, stroke_fill='black')
 			y_text += line_height
@@ -717,7 +718,7 @@ async def generate_meme(chat_id):
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)+250, y_text),
+			drawer.text((((image_width - line_width) / 2)+245, y_text),
 					line, fill='white', font=font,
 					stroke_width=2, stroke_fill='black')
 			y_text += line_height
