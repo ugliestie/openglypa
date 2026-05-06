@@ -60,7 +60,7 @@ async def generate_demotivator(chat_id, image):
 	return byte_io.read()
 
 async def generate_meme(chat_id):
-	select = random.randint(22, 22)
+	select = random.randint(1, 22)
 
 	if select == 1:
 		img = Image.open("./utils/resources/templates/1.jpg")
