@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import Message, BufferedInputFile
+from aiogram.types import Message, BufferedInputFile, ReactionTypeEmoji
 from aiogram.filters import Command
 from aiogram.utils.chat_member import ADMINS
 from aiogram.exceptions import TelegramBadRequest
@@ -30,10 +30,11 @@ async def cmd_help(message: Message):
 						"""<code>h j g l</code> - генерация длинного текста\n"""
 						"""<code>h j g 100</code> - генерация текста размером около 100 символов\n"""
 						"""<code>h j g привет</code> - генерация текста с началом "привет"\n"""
+						"""<code>h j hm я кружка?</code> - генерация ответа на да/нет вопрос\n"""
 						"""<code>h j p</code> - генерация опросов\n"""
 						"""<code>h j t</code> - генерация Топор 1+ сообщения\n"""
 						"""<code>h j d</code> - генерация демотиватора\n"""
-						"""<code>h j m</code> - генрация мема из случайного шаблона\n"""
+						"""<code>h j m</code> - генерация мема из случайного шаблона\n"""
 						"""<code>h j s</code> - настройки бота\n"""
 						"""<code>h j del</code> - удалить изображение/стикер из базы данных бота\n"""
 						"""<code>h j stats</code> - статистика базы данных чата\n"""
@@ -249,5 +250,33 @@ async def cmd_settings(message: Message):
 						f"""Количество сообщений в базе данных: {samples}\n"""
 						f"""Количество изображений в базе данных: {images}\n"""
 						f"""Количество стикеров в базе данных: {stickers}""")
+	else:
+		return
+	
+@router.message(F.text.lower().contains('h j hm'))
+async def generate_reply(message: Message):
+	yn = random.randint(1, 10)
+	if yn == 1:
+		await message.reply('неее...')
+	if yn == 2:
+		await message.reply('возможно в будущем! 🤔')
+	if yn == 3:
+		await message.reply('да, я уверен 🙂')
+	if yn == 4:
+		await message.reply('это странный вопрос. я не хочу отвечать')
+	if yn == 5:
+		await message.reply('это имеет шестидесятисемипроцентный шанс. не скажу, в какую сторону')
+	if yn == 6:
+		await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я не смог сложить 2+2") 
+	if yn == 7:
+		await message.reply('я спросил у спокойных волн на реке. им понравилось. всё сбудется')
+	if yn == 8:
+		set_reactions = ["🤔", "🤯", "😢", "🎉", "🤩", "🕊", "🤷‍♂", "🤷", "🤷‍♀", "😡"]
+		react = ReactionTypeEmoji(emoji=random.choice(set_reactions))
+		await message.react([react])
+	if yn == 9:
+		await message.answer_sticker(sticker="CAACAgIAAxkBAAEpAsFp--224lYB9gthIp4I36sDAAHjH5cAAiWPAAKHTklKtLyM8h5_QgE7BA")
+	if yn == 10:
+		await message.reply('да давай ура даааааа')
 	else:
 		return
