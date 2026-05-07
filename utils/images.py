@@ -69,8 +69,13 @@ async def generate_meme(chat_id):
 		drawer = ImageDraw.Draw(img)
 		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 25, encoding='UTF-8')
 		image_width, image_height = img.size
+  
 		y_text = 750
 		lines = textwrap.wrap(text, width=11)
+  
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+  
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -187,6 +192,10 @@ async def generate_meme(chat_id):
 		
 		y_text = 340
 		lines = textwrap.wrap(text, width=20)
+  
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+  
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -238,6 +247,10 @@ async def generate_meme(chat_id):
 		
 		y_text = 305
 		lines = textwrap.wrap(text[0], width=13)
+  
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+  
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -248,6 +261,10 @@ async def generate_meme(chat_id):
 
 		y_text = 170
 		lines = textwrap.wrap(text[1], width=19)
+  
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+  
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -258,6 +275,10 @@ async def generate_meme(chat_id):
 
 		y_text = 520
 		lines = textwrap.wrap(text[2], width=13)
+  
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+  
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -318,8 +339,12 @@ async def generate_meme(chat_id):
 		image_width = img.size[0]
 		text = await generate_sentences(chat_id=chat_id, count=2)
 		
-		y_text = 120
+		y_text = 178
 		lines = textwrap.wrap(text[0], width=20)
+	
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+	
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -327,8 +352,12 @@ async def generate_meme(chat_id):
 					line, fill='black', font=font)
 			y_text += line_height
 
-		y_text = 1100
+		y_text = 1156
 		lines = textwrap.wrap(text[1], width=20)
+	
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+	
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -354,6 +383,10 @@ async def generate_meme(chat_id):
 		
 		y_text = 250
 		lines = textwrap.wrap(text[0], width=15)
+  
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+  
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -363,6 +396,10 @@ async def generate_meme(chat_id):
 
 		y_text = 250
 		lines = textwrap.wrap(text[1], width=15)
+  
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -372,6 +409,11 @@ async def generate_meme(chat_id):
 
 		y_text = 730
 		lines = textwrap.wrap(text[2], width=15)
+  
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+
+		
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -381,6 +423,11 @@ async def generate_meme(chat_id):
 
 		y_text = 730
 		lines = textwrap.wrap(text[3], width=15)
+  
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+
+		
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -527,7 +574,7 @@ async def generate_meme(chat_id):
 
 	if select == 18:
 		img = Image.open("./utils/resources/templates/18.png")
-	
+
 		drawer = ImageDraw.Draw(img)
 		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 50, encoding='UTF-8')
 		image_width = img.size[0]
@@ -535,13 +582,17 @@ async def generate_meme(chat_id):
 		
 		y_text = 320
 		lines = textwrap.wrap(text, width=20)
+
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
 			drawer.text((((image_width - line_width) / 2)-25, y_text), 
 					line, fill='black', font=font)
 			y_text += line_height
-   
+
 		byte_io = BytesIO()
 		byte_io.name = 'image.png'
 		
@@ -559,7 +610,11 @@ async def generate_meme(chat_id):
 		text = await generate_sentences(chat_id=chat_id, count=2)
 
 		y_text = 120
-		lines = textwrap.wrap(text[0], width=29)
+		lines = textwrap.wrap(text[0], width=20)
+
+		if len(lines) > 1:
+			y_text -= (50 * (len(lines) - 1)) // 2
+
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -567,8 +622,12 @@ async def generate_meme(chat_id):
 					line, fill='white', stroke_width=2, stroke_fill='black', font=font)
 			y_text += line_height
 
-		y_text = 523
-		lines = textwrap.wrap(text[1], width=40)
+		y_text = 565
+		lines = textwrap.wrap(text[1], width=25)
+	
+		if len(lines) > 1:
+			y_text -= (50 * (len(lines) - 1)) // 2
+
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
@@ -594,6 +653,10 @@ async def generate_meme(chat_id):
 	
 		y_text = 230
 		lines = textwrap.wrap(text, width=25)
+  
+		if len(lines) > 1:
+			y_text -= (font.size * (len(lines) - 1)) // 2
+  
 		for line in lines:
 			line_width = font.getbbox(line)[2]
 			line_height = font.getbbox(line)[3]
