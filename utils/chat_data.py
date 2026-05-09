@@ -1,15 +1,60 @@
 from aiofile import AIOFile
-from pyutil import filereplace
+from pyutil import filereplace, fileoverwrite
 import os
+
+class FileException(Exception):
+    pass
 
 # Корпус данных чата устроен на основе логики NeuronBot
 # https://github.com/kesha1225/NeuronBot
 
 # Запись слов и выражений в файл, созданный под чат
 async def write_words(text, chat_id):
-	async with AIOFile(f"chats/{chat_id}/text.txt", "a", encoding="utf-8") as f:
-		text = text.replace("\n", ". ").replace("\n\n", ". ")
-		await f.write(text + ",")
+	if not os.path.exists(f"chats/{chat_id}"):
+		os.mkdir(f"chats/{chat_id}")
+	if not await check_ban_words(text, chat_id):
+		async with AIOFile(f"chats/{chat_id}/text.txt", "a", encoding="utf-8") as f:
+			text = text.replace("\n", ". ").replace("\n\n", ". ")
+			await f.write(text + ",")
+	else:
+		pass
+  
+async def write_ban_words(text, chat_id):
+	update_ban = [sample for sample in text.lower().split(",") if sample != ""]
+	if not os.path.exists(f"chats/{chat_id}"):
+		os.mkdir(f"chats/{chat_id}")
+	if os.path.isfile(f"chats/{chat_id}/ban.txt"):
+		async with AIOFile(f"chats/{chat_id}/ban.txt", "w+", encoding="utf-8") as f:
+			ban_words = await f.read()
+			ban_words_read = [sample.strip() for sample in ban_words.split(",") if sample != ""]
+			for string in update_ban:
+				if string in ban_words_read:
+					update_ban.remove(string)
+				else:
+					await f.write(string + ",")
+	else:
+		async with AIOFile(f"chats/{chat_id}/ban.txt", "a", encoding="utf-8") as f:
+			for string in update_ban:
+				await f.write(string + ",")
+	async with AIOFile(f"chats/{chat_id}/text.txt", encoding="utf-8") as f:
+		text_data = await f.read()
+		chat_words = [sample.strip() for sample in text_data.split(",")]
+		for string in chat_words:
+			if await check_ban_words(string.lower(), chat_id):
+				chat_words.remove(string)
+		fileoverwrite(f"chats/{chat_id}/text.txt", ','.join(chat_words))
+
+async def check_ban_words(text, chat_id):
+	if os.path.isfile(f"chats/{chat_id}/ban.txt"):
+		async with AIOFile(f"chats/{chat_id}/ban.txt", encoding="utf-8") as f:
+			ban_words = await f.read()
+			ban_words_read = [sample.strip() for sample in ban_words.split(",") if sample != ""]
+		if not ban_words_read:
+			return False
+		for string in ban_words_read:
+			if string in text.lower():
+				return True
+	return False
 
 # Запись file_id изображений в файл, созданный под чат (сами изображения обрабатываются только при использовании команд и не используют лишнее место на диске)
 async def write_images(*args):

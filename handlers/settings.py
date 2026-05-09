@@ -3,6 +3,8 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
+import os
+
 from utils.sqlite import *
 
 from keyboards.settings import *
@@ -11,6 +13,7 @@ router = Router()
 
 class Settings(StatesGroup):
 	waiting_for_lazyness = State()
+	waiting_for_ignore_words = State()
 
 @router.callback_query(F.data == 'generate')
 async def process_callback_generate(callback: CallbackQuery):
@@ -104,6 +107,82 @@ async def process_callback_generate_types(callback: CallbackQuery):
 					text="⚙️ Настройки типов контента, который присылает бот автоматически",
 					reply_markup=kb_settings_generate_types_automatic(await get_automatic_settings(callback.message.chat.id))
 				)
+	else:
+		await callback.answer("Вы не вызывали данные настройки")
+  
+@router.callback_query(F.data == 'ignore_words')
+async def process_callback_ignore_words(callback: CallbackQuery):
+	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+		await callback.message.edit_text(
+			text="🚫 Управление игнорируемыми словами",
+			reply_markup=kb_settings_ignore_words()
+		)
+	else:
+		await callback.answer("Вы не вызывали данные настройки")
+  
+@router.callback_query(F.data == 'ignore_words_add')
+async def process_callback_ignore_words_update(callback: CallbackQuery, state: FSMContext):
+	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+		await callback.message.edit_text(
+			text="🚫 Управление игнорируемыми словами\n"
+				f"Ответьте игнорируемыми строчками через запятую",
+			reply_markup=kb_settings_ignore_words_back()
+		)
+		await state.set_state(Settings.waiting_for_ignore_words.state)
+	else:
+		await callback.answer("Вы не вызывали данные настройки")
+  
+@router.message(Settings.waiting_for_ignore_words)
+async def state_update_ignore_words(message: Message, state: FSMContext):
+	from utils.chat_data import write_ban_words
+	if message.text:
+		await write_ban_words(message.text, message.chat.id)
+		await message.reply(text="Игнорируемые слова обновлены!",
+							reply_markup=kb_settings_ignore_words_back())
+		await state.clear()
+  
+@router.callback_query(F.data == 'ignore_words_delete')
+async def process_callback_ignore_words_update(callback: CallbackQuery):
+	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+		try:
+			os.remove(f"chats/{callback.message.chat.id}/ban.txt")
+			await callback.message.edit_text(text="Игнорируемые слова удалены!",
+								reply_markup=kb_settings_ignore_words_back())
+		except FileNotFoundError:
+			await callback.message.edit_text(text="Файла с игнориуемыми словами нет, удалять было нечего",
+								reply_markup=kb_settings_ignore_words_back())
+	else:
+		await callback.answer("Вы не вызывали данные настройки")
+   
+@router.callback_query(F.data == 'chat_data')
+async def process_callback_chat_data(callback: CallbackQuery):
+	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+		await callback.message.edit_text(
+			text="🗄️ Управление базами данных чата",
+			reply_markup=kb_settings_chat_data()
+		)
+	else:
+		await callback.answer("Вы не вызывали данные настройки")
+  
+@router.callback_query(F.data.startswith('chat_data_'))
+async def process_callback_ignore_words_update(callback: CallbackQuery):
+	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+		if callback.data == 'chat_data_text':
+			path = f"chats/{callback.message.chat.id}/text.txt"
+			message = "текста"
+		if callback.data == 'chat_data_images':
+			path = f"chats/{callback.message.chat.id}/images.txt"
+			message = "изображений"
+		if callback.data == 'chat_data_stickers':
+			path = f"chats/{callback.message.chat.id}/stickers.txt"
+			message = "стикеров"
+		try:
+			os.remove(path)
+			await callback.message.edit_text(text=f"База данных {message} удалена!",
+								reply_markup=kb_settings_chat_data_back())
+		except FileNotFoundError:
+			await callback.message.edit_text(text=f"Базы данных {message} нет, удалять было нечего",
+								reply_markup=kb_settings_chat_data_back())
 	else:
 		await callback.answer("Вы не вызывали данные настройки")
 
