@@ -9,7 +9,9 @@ def marker(flag):
 
 def kb_settings_main():
     inline_kb_list = [
-        [InlineKeyboardButton(text="Генерация", callback_data='generate')]
+        [InlineKeyboardButton(text="Генерация", callback_data='generate')],
+        [InlineKeyboardButton(text="База данных", callback_data='chat_data')],
+        [InlineKeyboardButton(text="Игнорируемые слова", callback_data='ignore_words')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
 
@@ -66,5 +68,34 @@ def kb_settings_generate_types_automatic(settings):
         ],
         [InlineKeyboardButton(text=f"Стикеры | {marker(settings[6])}", callback_data='type_automatic_stickers')],
         [InlineKeyboardButton(text="◀️ Назад", callback_data='generate_types')]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
+
+def kb_settings_ignore_words():
+    inline_kb_list = [
+        [InlineKeyboardButton(text="Добавить игнорируемые слова", callback_data='ignore_words_add')],
+        [InlineKeyboardButton(text="Очистить игнорируемые слова", callback_data='ignore_words_delete')],
+        [InlineKeyboardButton(text="◀️ Назад", callback_data='settings')]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
+
+def kb_settings_ignore_words_back():
+    inline_kb_list = [
+        [InlineKeyboardButton(text="◀️ Назад", callback_data='ignore_words')]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
+
+def kb_settings_chat_data():
+    inline_kb_list = [
+        [InlineKeyboardButton(text="Удалить текстовую базу данных", callback_data='chat_data_text')],
+        [InlineKeyboardButton(text="Удалить базу данных фотографий", callback_data='chat_data_images')],
+        [InlineKeyboardButton(text="Удалить базу данных стикеров", callback_data='chat_data_stickers')],
+        [InlineKeyboardButton(text="◀️ Назад", callback_data='settings')]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
+
+def kb_settings_chat_data_back():
+    inline_kb_list = [
+        [InlineKeyboardButton(text="◀️ Назад", callback_data='chat_data')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
