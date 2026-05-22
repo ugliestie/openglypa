@@ -64,6 +64,11 @@ def generate(samples, tries_count, size=None, chars_count=None, start=None):
 				elif size == 4:  # large
 					if len(result) >= 30:
 						return str_result
+  
+			elif chars_count is not None:
+				if len(str_result) >= chars_count - 10 and len(str_result) <= chars_count + 10:
+					return str_result
+  
 			else:
 				return str_result
 	else: 
