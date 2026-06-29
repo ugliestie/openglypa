@@ -56,7 +56,7 @@ async def handle_single(message: Message):
 				set_generations = [i for i in range(1, 8) if generation[i] == 1]
 				choice = random.choice(set_generations)
 				if choice == 1:
-					gen_message = await generate_sentence(message.chat.id)
+					gen_message = await generate_sentence(message.chat.id, size=2)
 					await message.answer(gen_message)
 				elif choice == 2:
 					try:
