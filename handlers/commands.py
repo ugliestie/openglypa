@@ -69,7 +69,7 @@ async def force_generate(message: Message):
 					await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji>  Бот не смог найти ничего подходящего с таким началом")
 					return
 		else:
-			gen_message = await generate_sentence(chat_id=message.chat.id)
+			gen_message = await generate_sentence(chat_id=message.chat.id, size=2)
 		if gen_message is None:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> База слов слишком мала для генерации")
 		else:
