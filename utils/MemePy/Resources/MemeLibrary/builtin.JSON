@@ -1,0 +1,319 @@
+{
+  "MeAlsoMe": {
+    "filename": "mealsome.png",
+    "text_zones": [
+      {
+        "pos": [60, 0],
+        "dimensions": [400, 95],
+        "font": "arial.ttf",
+        "font_size": 24
+      },
+      {
+        "pos": [120, 100],
+        "dimensions": [350, 100],
+        "font": "arial.ttf",
+        "font_size": 24
+      }
+    ]
+  },
+  "ItsTime": {
+    "filename": "itstime.png",
+    "text_zones": [
+      {
+        "pos": [60, 50],
+        "dimensions": [200, 150],
+        "font": "arial.ttf",
+        "font_size": 36,
+        "centering": ["True", "True"]
+      },
+      {
+      "pos": [95, 380],
+        "dimensions": [110, 75],
+        "font": "arial.ttf",
+        "font_size": 24,
+        "centering": ["True", "True"]
+      }
+    ]
+  },
+  "ClassNote": {
+    "filename": "classnote.png",
+    "text_zones": [
+      {
+        "pos": [585, 545],
+        "dimensions": [175, 140],
+        "font": "arial.ttf",
+        "font_size": 24,
+        "angle": 30,
+        "centering": ["True", "True"]
+      }
+    ]
+  },
+  "NutButton": {
+    "filename": "nutbutton.jpg",
+    "text_zones": [
+      {
+        "pos": [133, 300],
+        "dimensions": [175, 100],
+        "font": "arial.ttf",
+        "font_size": 56,
+        "angle": 10,
+        "centering": ["False", "True"]
+      }
+    ]
+  },
+  "Pills": {
+    "filename": "pills.jpg",
+    "text_zones": [
+      {
+        "pos": [235, 290],
+        "dimensions": [230, 40],
+        "font": "arial.ttf",
+        "font_size": 20,
+        "centering": ["True", "False"]
+      }
+    ]
+  },
+  "Balloon": {
+    "filename": "balloon.jpg",
+    "text_zones": [
+      {
+        "pos": [30, 300],
+        "dimensions": [200, 200],
+        "font": "arial.ttf",
+        "font_size": 40,
+        "centering": ["True", "True"]
+      },
+      {
+        "pos": [470, 100],
+        "dimensions": [300, 250],
+        "font": "arial.ttf",
+        "font_size": 40,
+        "centering": ["True", "True"]
+      },
+      {
+        "pos": [10, 750],
+        "dimensions": [200, 250],
+        "font": "arial.ttf",
+        "font_size": 40,
+        "centering": ["True", "True"]
+      }
+    ]
+  },
+  "Cola": {
+    "filename": "cola.jpg",
+    "text_zones": [
+      {
+        "pos": [180, 425],
+        "dimensions": [200, 200],
+        "font": "arial.ttf",
+        "font_size": 36,
+        "centering": ["True", "True"],
+        "text_color": [255, 255, 255]
+      },
+      {
+        "pos": [600, 350],
+        "dimensions": [180, 100],
+        "font": "arial.ttf",
+        "font_size": 36,
+        "angle": 30,
+        "centering": ["True", "True"]
+      }
+    ]
+  },
+  "Loud": {
+    "filename": "loud.jpg",
+    "text_zones": [
+      {
+        "pos": [850, 600],
+        "dimensions": [200, 200],
+        "font": "arial.ttf",
+        "font_size": 36,
+        "centering": ["True", "False"]
+      },
+      {
+        "pos": [860, 800],
+        "dimensions": [200, 200],
+        "font": "arial.ttf",
+        "font_size": 36,
+        "centering": ["True", "False"],
+        "optional": "True"
+      }
+    ]
+  },
+  "Milk": {
+    "filename": "milking.jpg",
+    "text_zones": [
+      {
+        "pos": [358, 184],
+        "dimensions": [342, 116],
+        "font": "impact.ttf",
+        "font_size": 72,
+        "centering": ["True", "True"]
+      },
+      {
+        "pos": [951, 456],
+        "dimensions": [471, 334],
+        "font": "impact.ttf",
+        "font_size": 72,
+        "centering": ["True", "True"],
+        "optional": "True"
+      }
+    ]
+  },
+  "Finally": {
+    "filename": "finally.jpg",
+    "text_zones": [
+      {
+        "pos": [1, 580],
+        "dimensions": [1069, 139],
+        "font": "impact.ttf",
+        "font_size": 96,
+        "centering": ["True", "True"]
+      },
+      {
+        "pos": [391, 328],
+        "dimensions": [396, 176],
+        "font": "impact.ttf",
+        "font_size": 72,
+        "centering": ["True", "True"],
+        "optional": "True"
+      }
+    ]
+  },
+  "Cliff": {
+    "filename": "cliff.jpg",
+    "text_zones": [
+      {
+        "pos": [46, 30],
+        "dimensions": [126, 50],
+        "font": "arial.ttf",
+        "font_size": 24,
+        "centering": ["True", "True"]
+      },
+      {
+        "pos": [272, 41],
+        "dimensions": [122, 77],
+        "font": "arial.ttf",
+        "font_size": 24,
+        "centering": ["True", "True"]
+      }
+    ]
+  },
+  "PredatorHandshake": {
+    "filename": "handshake.gif",
+    "text_zones": [
+      {
+        "pos": [10, 140],
+        "dimensions": [160, 100],
+        "font": "impact.ttf",
+        "font_size": 72,
+        "centering": ["True", "False"],
+        "text_color": [255, 255, 255]
+      },
+      {
+        "pos": [225, 140],
+        "dimensions": [175, 100],
+        "font": "impact.ttf",
+        "font_size": 72,
+        "centering": ["True", "False"],
+        "text_color": [255, 255, 255]
+      },
+      {
+        "pos": [145, 40],
+        "dimensions": [100, 70],
+        "font": "impact.ttf",
+        "font_size": 48,
+        "centering": ["True", "True"],
+        "text_color": [255, 255, 255]
+      }
+    ]
+  },
+  "Knight": {
+    "filename": "knight.png",
+    "text_zones": [
+      {
+        "pos": [350, 400],
+        "dimensions": [350, 180],
+        "font": "arial.ttf",
+        "font_size": 56,
+		"text_color": [255, 255, 255],
+        "centering": ["true", "true"],
+		"outline": "True"
+		},
+      {
+        "pos": [400, 900],
+        "dimensions": [300, 200],
+        "font": "arial.ttf",
+        "font_size": 56,
+        "centering": ["True", "True"],
+        "text_color": [255, 255, 255],
+		"outline": "True",
+		"angle": 17
+      }
+    ]
+  },
+  "LookUp": {
+	"filename": "lookup.gif",
+	"text_zones": [
+	  {
+		"pos": [8, 8],
+		"dimensions": [468, 73],
+		"font": "arial.ttf",
+		"font_size": 28,
+		"centering": ["False", "True"]
+	  }
+	]
+  },
+  "TradeOffer": {
+	"filename": "tradeoffer.jpg",
+	"text_zones": [
+	  {
+	    "pos": [12, 183],
+		"dimensions": [260, 150],
+		"font": "arial.ttf",
+		"font_size": 32,
+		"centering": ["True", "False"],
+		"text_color": [255, 255, 255],
+		"outline": "True"
+	  },
+	  {
+	    "pos": [326, 183],
+		"dimensions": [260, 150],
+		"font": "arial.ttf",
+		"font_size": 28,
+		"centering": ["True", "False"],
+		"text_color": [255, 255, 255],
+		"outline": "True"
+	  },
+	  {
+	    "pos": [72, 614],
+		"dimensions": [453, 174],
+		"font": "arial.ttf",
+		"font_size": 28,
+		"centering": ["True", "False"],
+		"text_color": [255, 255, 255],
+		"outline": "True",
+		"optional": "True"
+	  }
+	]
+  },
+  "ButGodSaid": {
+    "filename": "butgodsaid.jpg",
+	"text_zones": [
+	  {
+		"pos": [485, 0],
+		"dimensions": [490, 474],
+		"font": "arial.ttf",
+		"font_size": 48,
+		"centering": ["True", "True"]
+	  },
+	  {
+		"pos": [485, 475],
+		"dimensions": [490, 490],
+		"font": "arial.ttf",
+		"font_size": 48,
+		"centering": ["True", "True"]
+	  }
+	]
+  }
+}

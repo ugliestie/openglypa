@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont, ImageOps
+from utils.MemePy import MemeGenerator
 from io import BytesIO
 import random
 import textwrap
@@ -60,9 +61,109 @@ async def generate_demotivator(chat_id, image):
 	return byte_io.read()
 
 async def generate_meme(chat_id):
-	select = random.randint(1, 22)
+	# select = random.randint(1, 22)
+	select = random.choice(
+		[
+			"PredatorHandshake"
+		]
+	)
 
-	if select == 1:
+	try:
+		if select == "MeAlsoMe":
+			return MemeGenerator.get_meme_image(select, 
+								[
+									await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2)
+								]
+								)
+		
+		elif select == "ItsTime":
+			return MemeGenerator.get_meme_image(select, 
+								[await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2)])
+		
+		elif select == "ClassNote":
+			return MemeGenerator.get_meme_image(select, 
+								[await generate_sentence(chat_id=chat_id, size=2)])
+		
+		elif select == "NutButton":
+			return MemeGenerator.get_meme_image(select, 
+								[await generate_sentence(chat_id=chat_id, size=2)])
+		
+		elif select == "Pills":
+			return MemeGenerator.get_meme_image(select, 
+								[await generate_sentence(chat_id=chat_id, size=2)])
+		
+		elif select == "Balloon":
+			return MemeGenerator.get_meme_image(select, 
+								[
+									await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2)
+								]
+								)
+		
+		elif select == "Cola":
+			return MemeGenerator.get_meme_image(select, 
+								[
+									await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2)
+								]
+								)
+		
+		elif select == "Loud":
+			return MemeGenerator.get_meme_image(select, 
+								[
+									await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2)
+								]
+								)
+		
+		elif select == "Milk":
+			return MemeGenerator.get_meme_image(select, 
+								[
+									await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2)
+								]
+								)
+		
+		elif select == "Finally":
+			return MemeGenerator.get_meme_image(select, 
+								[
+									await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2)
+								]
+								)
+		
+		elif select == "Cliff":
+			return MemeGenerator.get_meme_image(select, 
+								[
+									await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2)
+								]
+								)
+		
+		elif select == "PredatorHandshake":
+			return MemeGenerator.get_meme_image(select, 
+								[
+									await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2)
+								]
+								)
+		
+		elif select == "TradeOffer":
+			return MemeGenerator.get_meme_image(select, 
+								[
+									await generate_sentence(chat_id=chat_id, size=2),
+									await generate_sentence(chat_id=chat_id, size=2)
+								]
+								)
+		
+	except Exception as e:
+		print(str(e))
+
+	"""if select == 1:
 		img = Image.open("./utils/resources/templates/1.jpg")
 		text = await generate_sentence(chat_id=chat_id)
 
@@ -792,4 +893,4 @@ async def generate_meme(chat_id):
 		img.save(byte_io, 'JPEG')
 		byte_io.seek(0)
 
-		return byte_io.read()
+		return byte_io.read()"""

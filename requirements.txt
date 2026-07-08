@@ -5,3 +5,4 @@ aiogram
 aiogram-media-group
 Pillow
 python-util
+requests
