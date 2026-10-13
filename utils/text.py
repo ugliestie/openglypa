@@ -1,5 +1,7 @@
-from utils.chat_data import read_words
 from random import choice
+
+from utils.chat_data import read_words
+
 
 # Спасибо Witless за реализацию алгоритма Маркова! 
 # https://github.com/jieggii/witless/blob/master/api/generator/generator.pyx

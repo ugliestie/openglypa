@@ -1,13 +1,12 @@
-from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
-
 import os
 
-from utils.sqlite import *
+from aiogram import F, Router
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import CallbackQuery, Message
 
 from keyboards.settings import *
+from utils.sqlite import *
 
 router = Router()
 
@@ -125,7 +124,7 @@ async def process_callback_ignore_words_update(callback: CallbackQuery, state: F
 	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		await callback.message.edit_text(
 			text="🚫 Управление игнорируемыми словами\n"
-				f"Ответьте игнорируемыми строчками через запятую",
+				"Ответьте игнорируемыми строчками через запятую",
 			reply_markup=kb_settings_ignore_words_back()
 		)
 		await state.set_state(Settings.waiting_for_ignore_words.state)

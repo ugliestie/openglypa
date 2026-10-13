@@ -31,10 +31,10 @@ async def db_start():
     db.commit()
 
 async def check_group(group_id):
-    user = cur.execute("SELECT * FROM group_commands_settings WHERE group_id == {key}".format(key=group_id)).fetchone()
+    user = cur.execute(f"SELECT * FROM group_commands_settings WHERE group_id == {group_id}").fetchone()
     if not user:
-        cur.execute("INSERT INTO group_commands_settings (group_id) VALUES ({key})".format(key=group_id))
-        cur.execute("INSERT INTO group_automatic_settings (group_id) VALUES ({key})".format(key=group_id))
+        cur.execute(f"INSERT INTO group_commands_settings (group_id) VALUES ({group_id})")
+        cur.execute(f"INSERT INTO group_automatic_settings (group_id) VALUES ({group_id})")
         db.commit()
 
 async def get_commands_settings(group_id):

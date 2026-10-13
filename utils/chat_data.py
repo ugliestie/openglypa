@@ -1,6 +1,8 @@
-from aiofile import AIOFile
-from pyutil import filereplace, fileoverwrite
 import os
+
+from aiofile import AIOFile
+from pyutil import fileoverwrite, filereplace
+
 
 class FileException(Exception):
     pass
