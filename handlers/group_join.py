@@ -1,6 +1,10 @@
 from aiogram import Router
-from aiogram.filters.chat_member_updated import \
-    ChatMemberUpdatedFilter, IS_NOT_MEMBER, MEMBER, ADMINISTRATOR
+from aiogram.filters.chat_member_updated import (
+    ADMINISTRATOR,
+    IS_NOT_MEMBER,
+    MEMBER,
+    ChatMemberUpdatedFilter,
+)
 from aiogram.types import ChatMemberUpdated
 
 router = Router()

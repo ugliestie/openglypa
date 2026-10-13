@@ -1,10 +1,10 @@
-from aiogram import Router, F
-from aiogram.types import Message, BufferedInputFile, ReactionTypeEmoji
-from aiogram.filters import Command
-from aiogram.utils.chat_member import ADMINS
-from aiogram.exceptions import TelegramBadRequest
-
 import random
+
+from aiogram import F, Router
+from aiogram.exceptions import TelegramBadRequest
+from aiogram.filters import Command
+from aiogram.types import BufferedInputFile, Message, ReactionTypeEmoji
+from aiogram.utils.chat_member import ADMINS
 
 from keyboards.settings import kb_settings_main
 from utils.sqlite import get_commands_settings
@@ -79,8 +79,8 @@ async def force_generate(message: Message):
 
 @router.message(F.text.lower() == 'h j t')
 async def generate_topor_message(message: Message):
-	from utils.topor import generate_topor
 	from main import random_image
+	from utils.topor import generate_topor
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[1] == 1:
 		try:
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
@@ -110,8 +110,8 @@ async def generate_topor_message(message: Message):
 
 @router.message(F.text.lower() == 'h j d')
 async def generate_demotivator_message(message: Message):
-	from utils.images import generate_demotivator
 	from main import random_image
+	from utils.images import generate_demotivator
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[2] == 1:
 		try:
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
@@ -227,7 +227,7 @@ async def cmd_settings(message: Message):
 
 @router.message(F.text.lower() == 'h j stats')
 async def cmd_settings(message: Message):
-	from utils.chat_data import read_words, read_images, read_stickers
+	from utils.chat_data import read_images, read_stickers, read_words
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
 		chat_id = message.chat.id
   

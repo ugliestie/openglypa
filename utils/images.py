@@ -1,12 +1,13 @@
-from PIL import Image, ImageDraw, ImageFont, ImageOps
-from io import BytesIO
 import random
 import textwrap
+from io import BytesIO
 
+from PIL import Image, ImageDraw, ImageFont, ImageOps
+
+from main import random_image
 from utils.chat_data import *
 from utils.text import generate_sentence, generate_sentences
 
-from main import random_image
 
 async def generate_demotivator(chat_id, image):
 	'''

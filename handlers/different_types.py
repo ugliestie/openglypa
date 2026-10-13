@@ -1,13 +1,12 @@
-from aiogram import Router, F
-from aiogram.types import Message, BufferedInputFile, ContentType as CT, ReactionTypeEmoji
-from aiogram.filters import StateFilter
-from aiogram.exceptions import TelegramBadRequest
-
-from aiogram_media_group import media_group_handler
-
 import os
-import re
 import random
+import re
+
+from aiogram import F, Router
+from aiogram.exceptions import TelegramBadRequest
+from aiogram.filters import StateFilter
+from aiogram.types import BufferedInputFile, Message, ReactionTypeEmoji
+from aiogram_media_group import media_group_handler
 
 router = Router()
 
@@ -26,7 +25,7 @@ def chance_hit(percent):
 @router.message(StateFilter(None), F.media_group_id)
 @media_group_handler
 async def handle_albums(group: list[Message]):
-	from utils.chat_data import write_words, write_images
+	from utils.chat_data import write_images, write_words
 	if (group[0].chat.type == 'group' or group[0].chat.type == 'supergroup') and group[0].from_user.is_bot is False:
 		for msg in group:
 			if msg.photo:
@@ -38,15 +37,21 @@ async def handle_albums(group: list[Message]):
 	
 @router.message(StateFilter(None))
 async def handle_single(message: Message):
+	from main import logger, random_image
+	from utils.chat_data import (
+		delete_sticker,
+		read_stickers,
+		write_images,
+		write_stickers,
+		write_words,
+	)
+	from utils.images import generate_demotivator, generate_meme
 	from utils.sqlite import get_automatic_generations
-	from utils.images import generate_meme, generate_demotivator
-	from utils.topor import generate_topor
 	from utils.text import generate_sentence, generate_sentences
-	from utils.chat_data import read_stickers, write_words, write_images, write_stickers, delete_sticker
-	from main import random_image, logger
+	from utils.topor import generate_topor
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
 		if not os.path.exists("chats"):
-			os.mkdir(f"chats")
+			os.mkdir("chats")
 		if not os.path.exists(f"chats/{message.chat.id}"):
 			os.mkdir(f"chats/{message.chat.id}")
 		
@@ -65,21 +70,21 @@ async def handle_single(message: Message):
 							photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 							caption=topor[0])
 					except Exception as e:
-						logger.warning(f"Ошибка при автоматической генерации Топор 1+: {str(e)}")
+						logger.warning(f"Ошибка при автоматической генерации Топор 1+: {e!s}")
 				elif choice == 3:
 					try:
 						demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id))
 						await message.answer_photo(
 							photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 					except Exception as e:
-						logger.warning(f"Ошибка при автоматической генерации демотиватора: {str(e)}")
+						logger.warning(f"Ошибка при автоматической генерации демотиватора: {e!s}")
 				elif choice == 4:
 					try:
 						meme = await generate_meme(message.chat.id)
 						await message.answer_photo(
 							photo=BufferedInputFile(meme, filename="meme.jpg"))
 					except Exception as e:
-						logger.warning(f"Ошибка при автоматической генерации мема: {str(e)}")
+						logger.warning(f"Ошибка при автоматической генерации мема: {e!s}")
 				elif choice == 5:
 					try:
 						await message.answer_poll(
@@ -89,7 +94,7 @@ async def handle_single(message: Message):
 						is_anonymous=False,
 						)
 					except Exception as e:
-						logger.warning(f"Ошибка при автоматической генерации опроса: {str(e)}")
+						logger.warning(f"Ошибка при автоматической генерации опроса: {e!s}")
 				elif choice == 6:
 					set_reactions = ["❤", "👍", "👎", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"]
 					react = ReactionTypeEmoji(emoji=random.choice(set_reactions))

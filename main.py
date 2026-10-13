@@ -1,16 +1,15 @@
 import asyncio
 import logging
-from aiogram import Bot, Dispatcher
-from aiogram.enums.parse_mode import ParseMode
-from aiogram.client.default import DefaultBotProperties
-
 import random
 
-from utils.sqlite import db_start
-from utils.chat_data import read_images, delete_image
+from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums.parse_mode import ParseMode
 
+from handlers import commands, different_types, group_join, settings
+from utils.chat_data import delete_image, read_images
 from utils.config import TOKEN
-from handlers import commands, different_types, settings, group_join
+from utils.sqlite import db_start
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)

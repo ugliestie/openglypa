@@ -1,5 +1,7 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 from utils.sqlite import *
+
 
 def marker(flag):
     if flag == 1:
