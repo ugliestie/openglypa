@@ -6,4 +6,5 @@ aiogram-media-group
 Pillow
 python-util
 sqlalchemy[asyncio]
+aiosqlite
 alembic
