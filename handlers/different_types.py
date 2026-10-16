@@ -18,9 +18,7 @@ commands_pattern = re.compile(
 )
 
 def chance_hit(percent):
-	if random.random()*100 < percent:
-		return True
-	return False
+	return random.random() * 100 < percent
 
 @router.message(StateFilter(None), F.media_group_id)
 @media_group_handler
@@ -37,6 +35,7 @@ async def handle_albums(group: list[Message]):
 	
 @router.message(StateFilter(None))
 async def handle_single(message: Message):
+	from database.requests import get_automatic_generations
 	from main import logger, random_image
 	from utils.chat_data import (
 		delete_sticker,
@@ -46,7 +45,6 @@ async def handle_single(message: Message):
 		write_words,
 	)
 	from utils.images import generate_demotivator, generate_meme
-	from utils.sqlite import get_automatic_generations
 	from utils.text import generate_sentence, generate_sentences
 	from utils.topor import generate_topor
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:

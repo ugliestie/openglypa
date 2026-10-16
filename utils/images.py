@@ -9,7 +9,7 @@ from utils.chat_data import *
 from utils.text import generate_sentence, generate_sentences
 
 
-async def generate_demotivator(chat_id, image):
+async def generate_demotivator(chat_id: int, image: bytes) -> bytes:
 	'''
 	Для демотиваторов использовался код библиотеки simpledemotivators
 	https://github.com/Infqq/simpledemotivators/blob/main/simpledemotivators/Demotivator.py
@@ -19,7 +19,7 @@ async def generate_demotivator(chat_id, image):
 	img_border = Image.new('RGB', (1060, 720), color='#000000')
 	border = ImageOps.expand(img_border, border=2, fill='#ffffff')
 	user_img = Image.open(image).convert("RGBA").resize((1050, 710))
-	(width, height) = user_img.size
+	(width, _height) = user_img.size
 	img.paste(border, (111, 96))
 	img.paste(user_img, (118, 103))
 	drawer = ImageDraw.Draw(img)
@@ -60,7 +60,7 @@ async def generate_demotivator(chat_id, image):
 
 	return byte_io.read()
 
-async def generate_meme(chat_id):
+async def generate_meme(chat_id: int) -> bytes | None:
 	select = random.randint(1, 22)
 
 	if select == 1:
@@ -715,7 +715,7 @@ async def generate_meme(chat_id):
 		drawer = ImageDraw.Draw(img)
 		font = ImageFont.truetype("./utils/resources/fonts/timesnewroman.ttf", 35, encoding='UTF-8')
 		font_title = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 60, encoding='UTF-8')
-		image_width, image_height = img.size
+		image_width, _image_height = img.size
 		text = await generate_sentences(chat_id=chat_id, count=7, size=2)
 
 		y_text = 8
