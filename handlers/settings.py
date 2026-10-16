@@ -5,8 +5,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 
+from database.requests import *
 from keyboards.settings import *
-from utils.sqlite import *
 
 router = Router()
 
@@ -46,7 +46,7 @@ async def lazyness_chosen(message: Message, state: FSMContext):
 		await state.clear()
 
 @router.callback_query(F.data.startswith('generate_types'))
-async def process_callback_generate_types(callback: CallbackQuery):
+async def process_callback_generate_types_choose(callback: CallbackQuery):
 	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		if callback.data == "generate_types":
 			await callback.message.edit_text(
@@ -120,7 +120,7 @@ async def process_callback_ignore_words(callback: CallbackQuery):
 		await callback.answer("Вы не вызывали данные настройки")
   
 @router.callback_query(F.data == 'ignore_words_add')
-async def process_callback_ignore_words_update(callback: CallbackQuery, state: FSMContext):
+async def process_callback_ignore_words_control(callback: CallbackQuery, state: FSMContext):
 	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		await callback.message.edit_text(
 			text="🚫 Управление игнорируемыми словами\n"
@@ -141,7 +141,7 @@ async def state_update_ignore_words(message: Message, state: FSMContext):
 		await state.clear()
   
 @router.callback_query(F.data == 'ignore_words_delete')
-async def process_callback_ignore_words_update(callback: CallbackQuery):
+async def process_callback_ignore_words_update_confirmation(callback: CallbackQuery):
 	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		try:
 			os.remove(f"chats/{callback.message.chat.id}/ban.txt")

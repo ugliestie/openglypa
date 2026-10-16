@@ -5,11 +5,13 @@ import random
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
+from alembic import command
+from alembic.config import Config
 
+from database.models import async_main
 from handlers import commands, different_types, group_join, settings
 from utils.chat_data import delete_image, read_images
 from utils.config import TOKEN
-from utils.sqlite import db_start
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -30,7 +32,9 @@ async def random_image(chat_id):
 			await delete_image(file_id, chat_id)
 
 async def on_startup():
-	await db_start()
+	await async_main()
+	alembic_cfg = Config("alembic.ini")
+	await asyncio.to_thread(command.upgrade, alembic_cfg, "head")
 
 # Запуск процесса поллинга новых апдейтов
 async def main():

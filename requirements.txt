@@ -5,3 +5,5 @@ aiogram
 aiogram-media-group
 Pillow
 python-util
+sqlalchemy[asyncio]
+alembic

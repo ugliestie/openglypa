@@ -7,7 +7,10 @@ from aiogram.filters.chat_member_updated import (
 )
 from aiogram.types import ChatMemberUpdated
 
+from database.requests import check_group
+
 router = Router()
+
 
 @router.my_chat_member(
     ChatMemberUpdatedFilter(
@@ -15,8 +18,9 @@ router = Router()
     )
 )
 async def bot_added_as_admin(event: ChatMemberUpdated):
+    await check_group(group_id=event.chat.id)
     await event.answer(
-        text='''Привет, я Openglypa <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> \n'''
-            f'''Спасибо, что добавили меня в "{event.chat.title}"! Я анализирую сообщения в групповом чате и генерирую на его основе контент. \n'''
-            '''Настрой меня с помощью команды <code>h j s</code> и узнай мои команды с помощью команды <code>h j h</code>!'''
+        text="""Привет, я Openglypa <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> \n"""
+        f'''Спасибо, что добавили меня в "{event.chat.title}"! Я анализирую сообщения в групповом чате и генерирую на его основе контент. \n'''
+        """Настрой меня с помощью команды <code>h j s</code> и узнай мои команды с помощью команды <code>h j h</code>!"""
     )

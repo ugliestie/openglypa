@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from utils.sqlite import *
+from database.requests import *
 
 
 def marker(flag):

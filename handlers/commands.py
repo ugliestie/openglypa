@@ -6,8 +6,8 @@ from aiogram.filters import Command
 from aiogram.types import BufferedInputFile, Message, ReactionTypeEmoji
 from aiogram.utils.chat_member import ADMINS
 
+from database.requests import get_commands_settings
 from keyboards.settings import kb_settings_main
-from utils.sqlite import get_commands_settings
 
 router = Router()
 
@@ -204,7 +204,7 @@ async def cmd_settings(message: Message):
 
 # TODO: добавить банлист для стикеров
 @router.message(F.text.lower() == 'h j del')
-async def cmd_settings(message: Message):
+async def cmd_delete(message: Message):
 	from utils.chat_data import delete_image, delete_sticker
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
 		if await is_message_admin(message, message.from_user.id):
@@ -226,7 +226,7 @@ async def cmd_settings(message: Message):
 		return
 
 @router.message(F.text.lower() == 'h j stats')
-async def cmd_settings(message: Message):
+async def cmd_stats(message: Message):
 	from utils.chat_data import read_images, read_stickers, read_words
 	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
 		chat_id = message.chat.id
