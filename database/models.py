@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Integer, TEXT
+from sqlalchemy import TEXT, Boolean, Integer
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, mapped_column
 

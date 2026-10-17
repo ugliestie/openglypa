@@ -5,9 +5,9 @@ import random
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
-from alembic import command
 from alembic.config import Config
 
+from alembic import command
 from database.models import async_main
 from handlers import commands, different_types, group_join, settings
 from utils.chat_data import delete_image, read_images
