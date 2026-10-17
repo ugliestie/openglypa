@@ -18,7 +18,7 @@ commands_pattern = re.compile(
 )
 
 def chance_hit(percent):
-	return random.random() * 100 < percent
+	return random.random() * 100 <= percent
 
 @router.message(StateFilter(None), F.media_group_id)
 @media_group_handler
@@ -54,7 +54,7 @@ async def handle_single(message: Message):
 			os.mkdir(f"chats/{message.chat.id}")
 		
 		generation = await get_automatic_generations(message.chat.id)
-		if generation[0] != 100 and chance_hit(100 - generation[0]):
+		if generation[0] != 100 and chance_hit(generation[0]):
 			try:
 				set_generations = [i for i in range(1, 8) if generation[i] == 1]
 				choice = random.choice(set_generations)
@@ -108,6 +108,8 @@ async def handle_single(message: Message):
 							await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> <b>Я не могу прислать стикер из-за того, что мне нельзя их отправлять.</b><br><br>Я больше не буду пытаться. Чтобы исправить это, разрешите боту присылать стикеры и в настройках бота включите их автоматическое присылание.")
 						else:
 							await delete_sticker(sticker, message.chat.id)
+					except Exception as e:
+						logger.warning(f"Ошибка при автоматической генерации стикера: {e!s}")
 			except:
 				pass
 		

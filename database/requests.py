@@ -6,7 +6,7 @@ from database.models import AutomaticSettings, CommandsSettings, async_session
 class GroupNotFound(BaseException):
     pass
 
-async def check_group(group_id):
+async def check_group(group_id: str) -> None:
     async with async_session() as session:
         group = await session.scalar(select(CommandsSettings).where(CommandsSettings.group_id == group_id))
         
@@ -15,7 +15,7 @@ async def check_group(group_id):
             session.add(AutomaticSettings(group_id=group_id))
             await session.commit()
 
-async def get_commands_settings(group_id):
+async def get_commands_settings(group_id: str) -> tuple[bool, bool, bool, bool, bool]:
     async with async_session() as session:
         group = await session.scalar(select(CommandsSettings).where(CommandsSettings.group_id == group_id))
         
@@ -24,7 +24,7 @@ async def get_commands_settings(group_id):
         else:
             return (group.text, group.topor, group.demotivators, group.memes, group.polls)
         
-async def get_automatic_settings(group_id):
+async def get_automatic_settings(group_id: str) -> tuple[bool, bool, bool, bool, bool, bool, bool]:
     async with async_session() as session:
         group = await session.scalar(select(AutomaticSettings).where(AutomaticSettings.group_id == group_id))
         
@@ -33,16 +33,16 @@ async def get_automatic_settings(group_id):
         else:
             return (group.text, group.topor, group.demotivators, group.memes, group.polls, group.reactions, group.stickers)       
 
-async def get_automatic_generations(group_id):
+async def get_automatic_generations(group_id: str) -> tuple[int, bool, bool, bool, bool, bool, bool, bool]:
     async with async_session() as session:
         group = await session.scalar(select(AutomaticSettings).where(AutomaticSettings.group_id == group_id))
         
         if group is None:
             raise GroupNotFound
         else:
-            return (group.text, group.topor, group.demotivators, group.memes, group.polls, group.reactions, group.stickers) 
+            return (group.lazyness, group.text, group.topor, group.demotivators, group.memes, group.polls, group.reactions, group.stickers) 
 
-async def set_setting(type_setting, kind_setting, setting, group_id):
+async def set_setting(type_setting: str, kind_setting: str, setting: bool, group_id: str) -> None:
     async with async_session() as session:   
         if type_setting == "commands":
             group = await session.scalar(select(CommandsSettings).where(CommandsSettings.group_id == group_id))
@@ -68,7 +68,7 @@ async def set_setting(type_setting, kind_setting, setting, group_id):
                 group.stickers = setting
             await session.commit()
 
-async def update_lazyness(lazyness, group_id):
+async def update_lazyness(lazyness: int, group_id: str) -> None:
     async with async_session() as session:
         group = await session.scalar(select(AutomaticSettings).where(CommandsSettings.group_id == group_id))
                 
