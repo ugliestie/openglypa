@@ -45,7 +45,7 @@ async def get_automatic_generations(group_id):
 async def set_setting(type_setting, kind_setting, setting, group_id):
     async with async_session() as session:   
         if type_setting == "commands":
-            group = await session.scalar(select(CommandsSettings).where(AutomaticSettings.group_id == group_id))
+            group = await session.scalar(select(CommandsSettings).where(CommandsSettings.group_id == group_id))
         elif type_setting == "automatic":
             group = await session.scalar(select(AutomaticSettings).where(AutomaticSettings.group_id == group_id))
         
@@ -54,7 +54,6 @@ async def set_setting(type_setting, kind_setting, setting, group_id):
         else:
             if kind_setting == "text":
                 group.text = setting
-                print(setting)
             elif kind_setting == "topor":
                 group.topor = setting
             elif kind_setting == "demotivators":
