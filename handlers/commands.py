@@ -189,7 +189,7 @@ async def generate_poll_message(message: Message):
 
 @router.message(F.text.lower() == 'h j s')
 async def cmd_settings(message: Message):
-	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False and (await get_commands_settings(message.chat.id))[4] == 1:
+	if (message.chat.type == 'group' or message.chat.type == 'supergroup') and message.from_user.is_bot is False:
 		if await is_message_admin(message, message.from_user.id):
 			await message.reply(
 				"⚙️ Настройки Openglypa",

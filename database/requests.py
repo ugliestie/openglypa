@@ -70,7 +70,7 @@ async def set_setting(type_setting: str, kind_setting: str, setting: bool, group
 
 async def update_lazyness(lazyness: int, group_id: str) -> None:
     async with async_session() as session:
-        group = await session.scalar(select(AutomaticSettings).where(CommandsSettings.group_id == group_id))
+        group = await session.scalar(select(AutomaticSettings).where(AutomaticSettings.group_id == group_id))
                 
         if group is None:
             raise GroupNotFound

@@ -18,7 +18,7 @@ commands_pattern = re.compile(
 )
 
 def chance_hit(percent):
-	return random.random() * 100 <= percent
+	return random.random() * 100 <= 100 - percent
 
 @router.message(StateFilter(None), F.media_group_id)
 @media_group_handler
