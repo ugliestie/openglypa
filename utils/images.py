@@ -9,11 +9,18 @@ from utils.chat_data import *
 from utils.text import generate_sentence, generate_sentences
 
 
+# Для демотиваторов использовался код библиотеки simpledemotivators
+# https://github.com/Infqq/simpledemotivators/blob/main/simpledemotivators/Demotivator.py
 async def generate_demotivator(chat_id: int, image: bytes) -> bytes:
-	'''
-	Для демотиваторов использовался код библиотеки simpledemotivators
-	https://github.com/Infqq/simpledemotivators/blob/main/simpledemotivators/Demotivator.py
-	'''
+	"""Генерация демотиватора
+
+	Args:
+		chat_id (int): id группового чата
+		image (bytes): изображение, которое будет в демотиваторе
+
+	Returns:
+		bytes: готовый демотиватор
+	"""
 
 	img = Image.new('RGB', (1280, 1024), color='black')
 	img_border = Image.new('RGB', (1060, 720), color='#000000')
@@ -60,7 +67,15 @@ async def generate_demotivator(chat_id: int, image: bytes) -> bytes:
 
 	return byte_io.read()
 
-async def generate_meme(chat_id: int) -> bytes | None:
+async def generate_meme(chat_id: int) -> bytes:
+	"""Генерация мема
+
+	Args:
+		chat_id (int): id группового чата
+
+	Returns:
+		bytes: готовый мем
+	"""
 	select = random.randint(1, 22)
 
 	if select == 1:

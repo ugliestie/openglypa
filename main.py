@@ -1,6 +1,6 @@
 import asyncio
-import logging
 import random
+from typing import BinaryIO
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -12,19 +12,23 @@ from database.models import async_main
 from handlers import commands, different_types, group_join, settings
 from utils.chat_data import delete_image, read_images
 from utils.config import TOKEN
+from utils.logs import setup_rich_logger
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
-# Объект бота
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
-# Диспетчер
 dp = Dispatcher()
 
-async def random_image(chat_id):
+async def random_image(chat_id: int) -> BinaryIO | None:
+	"""Скачивание случайного изображения в BinaryIO
+
+	Args:
+		chat_id (int): id группового чата
+
+	Returns:
+		bytes | None: изображение, или None, если его не получилось скачать
+	"""
 	photos_model = await read_images(chat_id)
-	for attempt_number in range(3):
+	for _ in range(3):
 		file_id = random.choice(photos_model)
 		try:
 			return await bot.download(file=file_id)
@@ -35,6 +39,7 @@ async def on_startup():
 	await async_main()
 	alembic_cfg = Config("alembic.ini")
 	await asyncio.to_thread(command.upgrade, alembic_cfg, "head")
+	setup_rich_logger()
 
 # Запуск процесса поллинга новых апдейтов
 async def main():
