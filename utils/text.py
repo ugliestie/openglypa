@@ -65,7 +65,7 @@ def generate(samples: list[str], tries_count: int, size=None, chars_count=None, 
 		if start is None:
 			result = [choice(start_frames)]
 		else:
-			if found_start_frame == True:
+			if found_start_frame == False:
 				result = [choice(possible)]
 			else:
 				result = [start_word]
