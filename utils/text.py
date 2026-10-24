@@ -105,7 +105,7 @@ def generate(samples: list[str], tries_count: int, size=None, chars_count=None, 
 			if len(str_result) >= chars_count - 10 and len(str_result) <= chars_count + 10:
 				return str_result
 
-		if len(result) != 1:
+		elif len(result) != 1:
 			return str_result
 
 	return None
@@ -124,13 +124,13 @@ async def generate_sentence(chat_id: int, size=None, chars_count=None, start=Non
 	"""
 	text_model = await read_words(chat_id=chat_id)
 	if size is not None:
-		message = generate(samples=text_model, tries_count=5000, size=size)
+		message = generate(samples=text_model, tries_count=10000, size=size)
 	elif chars_count is not None:
 		message = generate(samples=text_model, tries_count=10000, chars_count=chars_count)
 	elif start is not None:
 		message = generate(samples=text_model, tries_count=10000, start=start)
 	else:
-		message = generate(samples=text_model, tries_count=5000, size=0)
+		message = generate(samples=text_model, tries_count=10000, size=0)
 	return message
 
 async def generate_sentences(chat_id, count, size=0) -> list[str | None]:
@@ -144,4 +144,4 @@ async def generate_sentences(chat_id, count, size=0) -> list[str | None]:
 	Returns:
 		list[str | None]: лист выражений или None, если его не вышло сгенерировать
 	"""
-	return [generate(samples=await read_words(chat_id=chat_id), tries_count=5000, size=size) for _ in range(count)]
+	return [generate(samples=await read_words(chat_id=chat_id), tries_count=10000, size=size) for _ in range(count)]
