@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 import re
@@ -7,6 +8,8 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import StateFilter
 from aiogram.types import BufferedInputFile, Message, ReactionTypeEmoji
 from aiogram_media_group import media_group_handler
+
+logger = logging.getLogger(__name__)
 
 router = Router()
 
@@ -36,7 +39,7 @@ async def handle_albums(group: list[Message]):
 @router.message(StateFilter(None))
 async def handle_single(message: Message):
 	from database.requests import get_automatic_generations
-	from main import logger, random_image
+	from main import random_image
 	from utils.chat_data import (
 		delete_sticker,
 		read_stickers,

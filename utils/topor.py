@@ -6,7 +6,17 @@ from PIL import Image, ImageOps
 from utils.chat_data import read_words
 
 
-async def generate_topor(chat_id, image, text=None):
+async def generate_topor(chat_id: int, image: bytes, text=None) -> tuple[str, bytes]:
+	"""Генерация сообщения в стиле канала Топор 1+
+
+	Args:
+		chat_id (int): id группового чата
+		image (bytes): изображение
+		text (str, optional): текст, который необходимо обрезать, по умолчанию None, тогда берётся случайное выражение из базы данных чата
+
+	Returns:
+		tuple[str, bytes]: описание и обрезаная случайным образом картинка
+	"""
 	emojis = ['📣', '‼️', '❗️', '❓', '⚡️']
 
 	img = Image.open(image)
