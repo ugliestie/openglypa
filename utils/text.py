@@ -52,7 +52,9 @@ def generate(samples: list[str], tries_count: int, size=None, chars_count=None, 
 		try:
 			if not frame_map[start_word]:
 				raise Exception
+			found_start_frame = True
 		except:
+			found_start_frame = False
 			possible = [] # Массив возможных слов для продолжения
 		
 			for i in range(len(frames)-1): # Перебор всех фреймов
@@ -63,7 +65,7 @@ def generate(samples: list[str], tries_count: int, size=None, chars_count=None, 
 		if start is None:
 			result = [choice(start_frames)]
 		else:
-			if possible:
+			if found_start_frame == True:
 				result = [choice(possible)]
 			else:
 				result = [start_word]
