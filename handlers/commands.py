@@ -1,6 +1,7 @@
+import logging
 import random
 
-from aiogram import Bot, F, Router
+from aiogram import F, Router
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 from aiogram.types import BufferedInputFile, Message, ReactionTypeEmoji
@@ -9,6 +10,8 @@ from aiogram.utils.chat_member import ADMINS
 from database.requests import get_commands_settings
 from keyboards.settings import kb_settings_main
 from utils.text import FailedByTries, NoSamples, PossibleStartsNotFound
+
+logger = logging.getLogger(__name__)
 
 router = Router()
 
@@ -55,7 +58,7 @@ async def force_generate(message: Message):
 		if message.reply_to_message:
 			start = (message.reply_to_message.caption or message.reply_to_message.text)
 			if start is None:
-				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Бот не смог найти текст чтобы его продолжить...")
+				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Не могу найти текст, чтобы его продолжить...")
 				return
 		elif message.text:
 			if message.text.lower() != "h j g":
@@ -114,7 +117,8 @@ async def generate_topor_message(message: Message):
 		except TelegramBadRequest as e:
 			if "not enough rights" in str(e):
 				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу придумать из-за того, что мне нельзя отправлять изображе")
-		except Exception:
+		except Exception as e:
+			logger.error(f"Ошибка при вызове h j t: {e!s}")
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я ничего не придума")
 	else:
 		return
@@ -143,7 +147,8 @@ async def generate_demotivator_message(message: Message):
 			if "not enough rights" in str(e):
 				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу надемотивировать из-за того, что мне нельзя отправлять изображения")
 		except:
-			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я ничего не смог надемотивировать")
+			logger.error(f"Ошибка при вызове h j d: {e!s}")
+			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и ничего не вышло надемотивировать")
 	else:
 		return
 
@@ -160,7 +165,8 @@ async def generate_meme_message(message: Message):
 			if "not enough rights" in str(e):
 				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу намемить из-за того, что мне нельзя отправлять изображения")
 		except Exception:
-			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я ничего не смог намемить")
+			logger.error(f"Ошибка при вызове h j m: {e!s}")
+			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и ничего не вышло намемить")
 	else:
 		return
 
@@ -194,6 +200,7 @@ async def generate_poll_message(message: Message):
 			else:
 				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я не смог придумать опрос")
 		except:
+			logger.error(f"Ошибка при вызове h j p: {e!s}")
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я не смог придумать опрос")
 	else:
 		return
@@ -272,7 +279,7 @@ async def generate_reply(message: Message):
 	if yn == 2:
 		await message.reply('Возможно в будущем! 🤔')
 	if yn == 3:
-		await message.reply('Да, я уверен 🙂')
+		await message.reply('Да, у меня есть уверенность 🙂')
 	if yn == 4:
 		await message.reply('Это странный вопрос. Я не хочу отвечать')
 	if yn == 5:
