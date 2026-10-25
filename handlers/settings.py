@@ -3,7 +3,7 @@ import os
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, User
 
 from database.requests import *
 from keyboards.settings import *
@@ -16,7 +16,7 @@ class Settings(StatesGroup):
 
 @router.callback_query(F.data == 'generate')
 async def process_callback_generate(callback: CallbackQuery):
-	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+	if type(callback.message) is Message and type(callback.message.reply_to_message) is Message and type(callback.message.reply_to_message.from_user) is User and callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		await callback.message.edit_text(
 			text="⚙️ Настройки генерации",
 			reply_markup=kb_settings_generate()
@@ -26,7 +26,7 @@ async def process_callback_generate(callback: CallbackQuery):
 
 @router.callback_query(F.data == 'generate_lazyness')
 async def process_callback_generate_lazyness(callback: CallbackQuery, state: FSMContext):
-	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+	if type(callback.message) is Message and type(callback.message.reply_to_message) is Message and type(callback.message.reply_to_message.from_user) is User and callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		await callback.message.edit_text(
 			text="🥱 Управление ленью бота\n"
 				f"На данный момент бот ленится писать в {(await get_automatic_generations(callback.message.chat.id))[0]}% случаев\n"
@@ -39,7 +39,7 @@ async def process_callback_generate_lazyness(callback: CallbackQuery, state: FSM
 
 @router.message(Settings.waiting_for_lazyness)
 async def lazyness_chosen(message: Message, state: FSMContext):
-	if (message.text).isdigit and int(message.text) >= 0 and int(message.text) <= 100:
+	if message.text and (message.text).isdigit() and int(message.text) >= 0 and int(message.text) <= 100:
 		await update_lazyness(int(message.text), message.chat.id)
 		await message.reply(text="🥱 Лень бота изменена!",
 							reply_markup=kb_settings_generate_lazyness())
@@ -47,7 +47,7 @@ async def lazyness_chosen(message: Message, state: FSMContext):
 
 @router.callback_query(F.data.startswith('generate_types'))
 async def process_callback_generate_types_choose(callback: CallbackQuery):
-	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+	if type(callback.message) is Message and type(callback.message.reply_to_message) is Message and type(callback.message.reply_to_message.from_user) is User and callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		if callback.data == "generate_types":
 			await callback.message.edit_text(
 				text="⚙️ Настройки типов контента, отправляемых ботом",
@@ -68,50 +68,54 @@ async def process_callback_generate_types_choose(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith('type'))
 async def process_callback_generate_types(callback: CallbackQuery):
-	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
-		setting = await get_commands_settings(callback.message.chat.id)
-		if callback.data.startswith("type_commands"):
-			setting = await get_commands_settings(callback.message.chat.id)
-			if callback.data == "type_commands_text":
-				await set_setting("commands", "text", not(setting[0]), callback.message.chat.id)
-			elif callback.data == "type_commands_topor":
-				await set_setting("commands", "topor", not(setting[1]), callback.message.chat.id)
-			elif callback.data == "type_commands_demotivators":
-				await set_setting("commands", "demotivators", not(setting[2]), callback.message.chat.id)
-			elif callback.data == "type_commands_memes":
-				await set_setting("commands", "memes", not(setting[3]), callback.message.chat.id)
-			elif callback.data == "type_commands_polls":
-				await set_setting("commands", "polls", not(setting[4]), callback.message.chat.id)
-			await callback.message.edit_text(
-					text="⚙️ Настройки типов контента, который присылает бот с помощью команд",
-					reply_markup=kb_settings_generate_types_commands(await get_commands_settings(callback.message.chat.id))
-				)	
-		elif callback.data.startswith("type_automatic"):
-			setting = await get_automatic_settings(callback.message.chat.id)
-			if callback.data == "type_automatic_text":
-				await set_setting("automatic", "text", not(setting[0]), callback.message.chat.id)
-			elif callback.data == "type_automatic_topor":
-				await set_setting("automatic", "topor", not(setting[1]), callback.message.chat.id)
-			elif callback.data == "type_automatic_demotivators":
-				await set_setting("automatic", "demotivators", not(setting[2]), callback.message.chat.id)
-			elif callback.data == "type_automatic_memes":
-				await set_setting("automatic", "memes", not(setting[3]), callback.message.chat.id)
-			elif callback.data == "type_automatic_polls":
-				await set_setting("automatic", "polls", not(setting[4]), callback.message.chat.id)
-			elif callback.data == "type_automatic_reactions":
-				await set_setting("automatic", "reactions", not(setting[5]), callback.message.chat.id)
-			elif callback.data == "type_automatic_stickers":
-				await set_setting("automatic", "stickers", not(setting[6]), callback.message.chat.id)
-			await callback.message.edit_text(
-					text="⚙️ Настройки типов контента, который присылает бот автоматически",
-					reply_markup=kb_settings_generate_types_automatic(await get_automatic_settings(callback.message.chat.id))
-				)
+	if type(callback.message) is Message and type(callback.message.reply_to_message) is Message and type(callback.message.reply_to_message.from_user) is User and callback.from_user.id == callback.message.reply_to_message.from_user.id:
+		if type(callback.data) is str:
+			if callback.data.startswith("type_commands"):
+				setting = await get_commands_settings(callback.message.chat.id)
+				if callback.data == "type_commands_text":
+					await set_setting("commands", "text", not(setting[0]), callback.message.chat.id)
+				elif callback.data == "type_commands_topor":
+					await set_setting("commands", "topor", not(setting[1]), callback.message.chat.id)
+				elif callback.data == "type_commands_demotivators":
+					await set_setting("commands", "demotivators", not(setting[2]), callback.message.chat.id)
+				elif callback.data == "type_commands_memes":
+					await set_setting("commands", "memes", not(setting[3]), callback.message.chat.id)
+				elif callback.data == "type_commands_polls":
+					await set_setting("commands", "polls", not(setting[4]), callback.message.chat.id)
+				elif callback.data == "type_commands_hm":
+					await set_setting("commands", "hm", not(setting[5]), callback.message.chat.id)
+				await callback.message.edit_text(
+						text="⚙️ Настройки типов контента, который присылает бот с помощью команд",
+						reply_markup=kb_settings_generate_types_commands(await get_commands_settings(callback.message.chat.id))
+					)	
+			elif callback.data.startswith("type_automatic"):
+				setting = await get_automatic_settings(callback.message.chat.id)
+				if callback.data == "type_automatic_text":
+					await set_setting("automatic", "text", not(setting[0]), callback.message.chat.id)
+				elif callback.data == "type_automatic_topor":
+					await set_setting("automatic", "topor", not(setting[1]), callback.message.chat.id)
+				elif callback.data == "type_automatic_demotivators":
+					await set_setting("automatic", "demotivators", not(setting[2]), callback.message.chat.id)
+				elif callback.data == "type_automatic_memes":
+					await set_setting("automatic", "memes", not(setting[3]), callback.message.chat.id)
+				elif callback.data == "type_automatic_polls":
+					await set_setting("automatic", "polls", not(setting[4]), callback.message.chat.id)
+				elif callback.data == "type_automatic_reactions":
+					await set_setting("automatic", "reactions", not(setting[5]), callback.message.chat.id)
+				elif callback.data == "type_automatic_stickers":
+					await set_setting("automatic", "stickers", not(setting[6]), callback.message.chat.id)
+				await callback.message.edit_text(
+						text="⚙️ Настройки типов контента, который присылает бот автоматически",
+						reply_markup=kb_settings_generate_types_automatic(await get_automatic_settings(callback.message.chat.id))
+					)
+			else:
+				return
 	else:
 		await callback.answer("Вы не вызывали данные настройки")
   
 @router.callback_query(F.data == 'ignore_words')
 async def process_callback_ignore_words(callback: CallbackQuery):
-	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+	if type(callback.message) is Message and type(callback.message.reply_to_message) is Message and type(callback.message.reply_to_message.from_user) is User and callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		await callback.message.edit_text(
 			text="🚫 Управление игнорируемыми словами",
 			reply_markup=kb_settings_ignore_words()
@@ -121,7 +125,7 @@ async def process_callback_ignore_words(callback: CallbackQuery):
   
 @router.callback_query(F.data == 'ignore_words_add')
 async def process_callback_ignore_words_control(callback: CallbackQuery, state: FSMContext):
-	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+	if type(callback.message) is Message and type(callback.message.reply_to_message) is Message and type(callback.message.reply_to_message.from_user) is User and callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		await callback.message.edit_text(
 			text="🚫 Управление игнорируемыми словами\n"
 				"Ответьте игнорируемыми строчками через запятую",
@@ -142,7 +146,7 @@ async def state_update_ignore_words(message: Message, state: FSMContext):
   
 @router.callback_query(F.data == 'ignore_words_delete')
 async def process_callback_ignore_words_update_confirmation(callback: CallbackQuery):
-	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+	if type(callback.message) is Message and type(callback.message.reply_to_message) is Message and type(callback.message.reply_to_message.from_user) is User and callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		try:
 			os.remove(f"chats/{callback.message.chat.id}/ban.txt")
 			await callback.message.edit_text(text="Игнорируемые слова удалены!",
@@ -155,7 +159,7 @@ async def process_callback_ignore_words_update_confirmation(callback: CallbackQu
    
 @router.callback_query(F.data == 'chat_data')
 async def process_callback_chat_data(callback: CallbackQuery):
-	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+	if type(callback.message) is Message and type(callback.message.reply_to_message) is Message and type(callback.message.reply_to_message.from_user) is User and callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		await callback.message.edit_text(
 			text="🗄️ Управление базами данных чата",
 			reply_markup=kb_settings_chat_data()
@@ -165,7 +169,7 @@ async def process_callback_chat_data(callback: CallbackQuery):
   
 @router.callback_query(F.data.startswith('chat_data_'))
 async def process_callback_ignore_words_update(callback: CallbackQuery):
-	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+	if type(callback.message) is Message and type(callback.message.reply_to_message) is Message and type(callback.message.reply_to_message.from_user) is User and callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		if callback.data == 'chat_data_text':
 			path = f"chats/{callback.message.chat.id}/text.txt"
 			message = "текста"
@@ -187,7 +191,7 @@ async def process_callback_ignore_words_update(callback: CallbackQuery):
 
 @router.callback_query(F.data == 'settings')
 async def process_callback_settings(callback: CallbackQuery):
-	if callback.from_user.id == callback.message.reply_to_message.from_user.id:
+	if type(callback.message) is Message and type(callback.message.reply_to_message) is Message and type(callback.message.reply_to_message.from_user) is User and callback.from_user.id == callback.message.reply_to_message.from_user.id:
 		await callback.message.edit_text(
 			text="⚙️ Настройки Openglypa",
 			reply_markup=kb_settings_main()

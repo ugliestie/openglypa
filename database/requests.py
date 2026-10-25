@@ -20,7 +20,7 @@ async def check_group(group_id: int) -> None:
             session.add(AutomaticSettings(group_id=group_id))
             await session.commit()
 
-async def get_commands_settings(group_id: int) -> tuple[bool, bool, bool, bool, bool]:
+async def get_commands_settings(group_id: int) -> tuple[bool, bool, bool, bool, bool, bool]:
     """Получение списка включенных/выключенных и выключенных команд
 
     Args:
@@ -30,7 +30,7 @@ async def get_commands_settings(group_id: int) -> tuple[bool, bool, bool, bool, 
         GroupNotFound: группы нет в базе данных
 
     Returns:
-        tuple[bool, bool, bool, bool, bool]: список включенных/выключенных команд по типам text, topor, demotivators, memes, polls
+        tuple[bool, bool, bool, bool, bool, bool]: список включенных/выключенных команд по типам text, topor, demotivators, memes, polls, hm
     """
     async with async_session() as session:
         group = await session.scalar(select(CommandsSettings).where(CommandsSettings.group_id == str(group_id)))
@@ -38,7 +38,7 @@ async def get_commands_settings(group_id: int) -> tuple[bool, bool, bool, bool, 
         if group is None:
             raise GroupNotFound
         else:
-            return (group.text, group.topor, group.demotivators, group.memes, group.polls)
+            return (group.text, group.topor, group.demotivators, group.memes, group.polls, group.hm)
         
 async def get_automatic_settings(group_id: int) -> tuple[bool, bool, bool, bool, bool, bool, bool]:
     """Получение списка включенных/выключенных автоматических генераций
@@ -115,6 +115,8 @@ async def set_setting(type_setting: str, kind_setting: str, setting: bool, group
                 group.reactions = setting
             elif type(group) is AutomaticSettings and kind_setting == "stickers":
                 group.stickers = setting
+            elif type(group) is CommandsSettings and kind_setting == "hm":
+                group.hm = setting
             await session.commit()
 
 async def update_lazyness(lazyness: int, group_id: int) -> None:

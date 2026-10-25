@@ -3,9 +3,6 @@ from random import choice
 from utils.chat_data import read_words
 
 
-class NoSamples(BaseException):
-    pass
-
 class PossibleStartsNotFound(BaseException):
     pass
 
@@ -14,7 +11,7 @@ class FailedByTries(BaseException):
 
 # Спасибо Witless за реализацию алгоритма Маркова! 
 # https://github.com/jieggii/witless/blob/master/api/generator/generator.pyx
-def generate(samples: list[str], tries_count: int, size=0, chars_count=None, start=None) -> str:
+def generate(samples: list[str], tries_count: int, size: int = 0, chars_count: int | None =None, start: str | None = None) -> str:
 	"""Генерация выражения на основе массива исходных с помощью цепи Маркова
 
 	Args:
@@ -38,9 +35,6 @@ def generate(samples: list[str], tries_count: int, size=0, chars_count=None, sta
 	start_frames = []
 	frame_map = {}
  
-	if not samples:
-		raise NoSamples
-
 	for sample in samples:
 		words = sample.split(" ")
 		frames.append(_start)
@@ -80,7 +74,7 @@ def generate(samples: list[str], tries_count: int, size=0, chars_count=None, sta
 		if start is None:
 			result = [choice(start_frames)]
 		else:
-			if found_start_frame == False:
+			if found_start_frame is False:
 				result = [choice(possible)]
 			else:
 				result = [start_word]
@@ -139,14 +133,12 @@ async def generate_sentence(chat_id: int, size=0, chars_count=None, start=None) 
 		str: выражение
 	"""
 	text_model = await read_words(chat_id=chat_id)
-	if size != 0:
-		message = generate(samples=text_model, tries_count=10000, size=size)
+	if start is not None:
+		message = generate(samples=text_model, tries_count=10000, start=start)
 	elif chars_count is not None:
 		message = generate(samples=text_model, tries_count=10000, chars_count=chars_count)
-	elif start is not None:
-		message = generate(samples=text_model, tries_count=10000, start=start)
 	else:
-		message = generate(samples=text_model, tries_count=10000, size=0)
+		message = generate(samples=text_model, tries_count=10000, size=size)
 	return message
 
 async def generate_sentences(chat_id, count, size=0) -> list[str]:
@@ -155,7 +147,7 @@ async def generate_sentences(chat_id, count, size=0) -> list[str]:
 	Args:
 		chat_id (_type_): id группового чата
 		count (_type_): количество выражений
-		size (int, optional): размер сообщения, задаваемое при наличии, по умолчанию 0, если None - любое, если 0 - до 100 слов, 1 - от двух до трёх, 2 - от четырёх до семи, 3 - от двух до семи, 4 - сообщение больше десяти слов.
+		size (int, optional): размер сообщения, задаваемое при наличии, по умолчанию 0, если 0 - до 100 слов, 1 - от двух до трёх, 2 - от четырёх до семи, 3 - от двух до семи, 4 - сообщение больше десяти слов.
 
 	Returns:
 		list[str]: лист выражений

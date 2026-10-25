@@ -1,15 +1,24 @@
 import asyncio
+import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
 from alembic.config import Config
+from rich.logging import RichHandler
 
 from alembic import command
 from database.models import async_main
 from handlers import commands, different_types, group_join, settings
 from utils.config import TOKEN
-from utils.logs import setup_rich_logger
+
+FORMAT = "%(message)s"
+logging.basicConfig(
+    level="WARNING", format=FORMAT, datefmt="[%X]", handlers=[RichHandler(
+				rich_tracebacks=True,
+				tracebacks_show_locals=True,
+				show_time=False)]
+)
 
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
@@ -22,7 +31,6 @@ async def on_startup():
 	await async_main()
 	alembic_cfg = Config("alembic.ini")
 	await asyncio.to_thread(command.upgrade, alembic_cfg, "head")
-	setup_rich_logger()
 
 # Запуск процесса поллинга новых апдейтов
 async def main():
@@ -31,6 +39,7 @@ async def main():
 	dp.include_routers(commands.router, different_types.router, settings.router, group_join.router)
 
 	await bot.delete_webhook(drop_pending_updates=True)
+
 	await dp.start_polling(bot)
 
 if __name__ == "__main__":

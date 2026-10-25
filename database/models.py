@@ -4,10 +4,11 @@ from sqlalchemy.orm import DeclarativeBase, mapped_column
 
 from utils.config import DB_URL
 
-engine = create_async_engine(url=DB_URL, echo=True)
+engine = create_async_engine(url=DB_URL)
 
 async_session = async_sessionmaker(engine)
 
+extend = {'extend_existing': True} 
 
 class Base(AsyncAttrs, DeclarativeBase):
     pass
@@ -15,7 +16,7 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 class CommandsSettings(Base):
     __tablename__ = "group_commands_settings"
-    __table_args__ = {'extend_existing': True} 
+    __table_args__ = extend
 
     group_id = mapped_column(TEXT, primary_key=True)
     text = mapped_column(Boolean, default=True)
@@ -23,11 +24,12 @@ class CommandsSettings(Base):
     demotivators = mapped_column(Boolean, default=True)
     memes = mapped_column(Boolean, default=True)
     polls = mapped_column(Boolean, default=True)
+    hm = mapped_column(Boolean, default=True)
 
 
 class AutomaticSettings(Base):
     __tablename__ = "group_automatic_settings"
-    __table_args__ = {'extend_existing': True} 
+    __table_args__ = extend
 
     group_id = mapped_column(TEXT, primary_key=True)
     lazyness = mapped_column(Integer, default=95)

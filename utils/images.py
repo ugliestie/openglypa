@@ -66,7 +66,7 @@ async def generate_demotivator(chat_id: int, image: BinaryIO) -> bytes:
 
 	return byte_io.read()
 
-async def generate_meme(chat_id: int, bot: Bot) -> bytes:
+async def generate_meme(chat_id: int, bot: Bot) -> bytes:  # ty: ignore[invalid-return-type]
 	"""Генерация мема
 
 	Args:
@@ -83,7 +83,7 @@ async def generate_meme(chat_id: int, bot: Bot) -> bytes:
 
 		drawer = ImageDraw.Draw(img)
 		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 25, encoding='UTF-8')
-		image_width, image_height = img.size
+		image_width, _image_height = img.size
   
 		y_text = 750
 		lines = textwrap.wrap(text, width=11)
@@ -202,7 +202,7 @@ async def generate_meme(chat_id: int, bot: Bot) -> bytes:
 	
 		drawer = ImageDraw.Draw(img)
 		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 15, encoding='UTF-8')
-		image_width, image_height = img.size
+		image_width, _image_height = img.size
 		text = await generate_sentence(chat_id=chat_id)
 		
 		y_text = 340
@@ -231,7 +231,7 @@ async def generate_meme(chat_id: int, bot: Bot) -> bytes:
 	
 		drawer = ImageDraw.Draw(img)
 		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 35, encoding='UTF-8')
-		image_width, image_height = img.size
+		image_width, _image_height = img.size
 		text = await generate_sentence(chat_id=chat_id)
 		
 		y_text = 10
@@ -257,7 +257,7 @@ async def generate_meme(chat_id: int, bot: Bot) -> bytes:
 	
 		drawer = ImageDraw.Draw(img)
 		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 32, encoding='UTF-8')
-		image_width, image_height = img.size
+		image_width, _image_height = img.size
 		text = await generate_sentences(chat_id=chat_id, count=3)
 		
 		y_text = 305
@@ -315,7 +315,7 @@ async def generate_meme(chat_id: int, bot: Bot) -> bytes:
 	
 		drawer = ImageDraw.Draw(img)
 		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 20, encoding='UTF-8')
-		image_width, image_height = img.size
+		image_width, _image_height = img.size
 		text = await generate_sentences(chat_id=chat_id, count=2)
 		
 		y_text = 32
@@ -692,7 +692,7 @@ async def generate_meme(chat_id: int, bot: Bot) -> bytes:
 
 		drawer = ImageDraw.Draw(img)
 		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 45, encoding='UTF-8')
-		image_width, image_height = img.size
+		image_width, _image_height = img.size
 		text = await generate_sentences(chat_id=chat_id, count=2)
 
 		y_text = 4

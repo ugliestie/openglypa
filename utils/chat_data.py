@@ -8,11 +8,20 @@ from aiogram import Bot
 from pyutil import fileoverwrite, filereplace
 
 
-class FileException(Exception):
-	pass
+class NoSamples(Exception):
+	def __init__(self, type: str):
+		self.type = type
+		
+	def __str__(self):
+		if self.type == "words":
+			return "Нет текстовых выражений в файле чата"
+		elif self.type == "images":
+			return "Нет file_id изображений в файле чата"
+		elif self.type == "stickers":
+			return "Нет file_id стикеров в файле чата"
 
 class RandomImageNotFound(BaseException):
-    pass
+	pass
 
 # Корпус данных чата устроен на основе логики NeuronBot
 # https://github.com/kesha1225/NeuronBot
@@ -114,27 +123,23 @@ async def write_stickers(chat_id: int, file_id: str):
 	async with aiofiles.open(f"chats/{chat_id}/stickers.txt", "a", encoding="utf-8") as f:
 		await f.write(file_id + ",")
 
-async def read_words(chat_id: int, topor=False) -> list[str]:
+async def read_words(chat_id: int) -> list[str]:
 	"""Получение слов и выражений из файла, созданного под чат
 
 	Args:
 		chat_id (int): id группового чата
-		topor (bool, optional): получить выражения для функции generate_topor, по умолчанию False.
 
 	Returns:
 		list[str]: лист выражений
 	"""
-	if topor:
-		async with aiofiles.open(f"chats/{chat_id}/text.txt", encoding="utf-8") as f:
-			text = str(await f.read())
-			return [sample.strip() for sample in text.split(",") if len(sample)>3 and sample != '']
-	# Получение модели слов для работы цепи Маркова
-	else:
-		async with aiofiles.open(f"chats/{chat_id}/text.txt", encoding="utf-8") as f:
-			text = str(await f.read())
-			return [sample.strip() for sample in text.split(",") if sample != '']
-
-# Получение изображений из файла, созданного под чат	
+	async with aiofiles.open(f"chats/{chat_id}/text.txt", encoding="utf-8") as f:
+		text = str(await f.read())
+		samples = [sample.strip() for sample in text.split(",") if sample != '']
+		if not samples:
+			raise NoSamples('words')
+		else:
+			return samples
+	
 async def read_images(chat_id) -> list[str]:
 	"""Получение изображений из файла, созданного под чат
 
@@ -146,7 +151,11 @@ async def read_images(chat_id) -> list[str]:
 	"""
 	async with aiofiles.open(f"chats/{chat_id}/images.txt", encoding="utf-8") as f:
 		images = str(await f.read())
-		return [sample for sample in images.split(",") if sample != ""]
+		samples = [sample for sample in images.split(",") if sample != ""]
+		if not samples:
+			raise NoSamples('images')
+		else:
+			return samples
 
 async def random_image(chat_id: int, bot: Bot) -> BinaryIO:
 	"""Скачивание случайного изображения в BinaryIO
@@ -161,12 +170,13 @@ async def random_image(chat_id: int, bot: Bot) -> BinaryIO:
 	for _ in range(3):
 		file_id = random.choice(photos_model)
 		try:
-			return await bot.download(file=file_id)
-		except:
+			image = await bot.download(file=file_id)
+			if image is None:
+				raise RandomImageNotFound
+		except RandomImageNotFound:
 			await delete_image(file_id, chat_id)
 	raise RandomImageNotFound
 	
-# Получение стикеров из файла, созданного под чат	
 async def read_stickers(chat_id) -> list[str]:
 	"""Получение стикеров из файла, созданного под чат
 
@@ -178,7 +188,11 @@ async def read_stickers(chat_id) -> list[str]:
 	"""
 	async with aiofiles.open(f"chats/{chat_id}/stickers.txt", encoding="utf-8") as f:
 		stickers = str(await f.read())
-		return [sample for sample in stickers.split(",") if sample != ""]
+		samples = [sample for sample in stickers.split(",") if sample != ""]
+		if not samples:
+			raise NoSamples('stickers')
+		else:
+			return samples
 	
 async def delete_image(file_id, chat_id) -> None:
 	"""Удаление из файла изображения, к которому невозможно получить доступ

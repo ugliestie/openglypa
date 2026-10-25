@@ -49,7 +49,10 @@ def kb_settings_generate_types_commands(settings):
             InlineKeyboardButton(text=f"Демотиваторы | {marker(settings[2])}", callback_data='type_commands_demotivators'),
             InlineKeyboardButton(text=f"Мемы | {marker(settings[3])}", callback_data='type_commands_memes')
         ],
-        [InlineKeyboardButton(text=f"Опросы | {marker(settings[4])}", callback_data='type_commands_polls')],
+        [
+            InlineKeyboardButton(text=f"Опросы | {marker(settings[4])}", callback_data='type_commands_polls'),
+            InlineKeyboardButton(text=f"Хм... | {marker(settings[5])}", callback_data='type_commands_hm')
+        ],
         [InlineKeyboardButton(text="◀️ Назад", callback_data='generate_types')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
