@@ -173,6 +173,8 @@ async def random_image(chat_id: int, bot: Bot) -> BinaryIO:
 			image = await bot.download(file=file_id)
 			if image is None:
 				raise RandomImageNotFound
+			else:
+				return image
 		except RandomImageNotFound:
 			await delete_image(file_id, chat_id)
 	raise RandomImageNotFound
