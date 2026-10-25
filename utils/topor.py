@@ -1,12 +1,13 @@
 import random
 from io import BytesIO
+from typing import BinaryIO
 
 from PIL import Image, ImageOps
 
 from utils.chat_data import read_words
 
 
-async def generate_topor(chat_id: int, image: bytes, text=None) -> tuple[str, bytes]:
+async def generate_topor(chat_id: int, image: BinaryIO, text=None) -> tuple[str, bytes]:
 	"""Генерация сообщения в стиле канала Топор 1+
 
 	Args:

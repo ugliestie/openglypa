@@ -1,12 +1,18 @@
 import os
+import random
 import string
+from typing import BinaryIO
 
 import aiofiles
+from aiogram import Bot
 from pyutil import fileoverwrite, filereplace
 
 
 class FileException(Exception):
 	pass
+
+class RandomImageNotFound(BaseException):
+    pass
 
 # Корпус данных чата устроен на основе логики NeuronBot
 # https://github.com/kesha1225/NeuronBot
@@ -141,6 +147,24 @@ async def read_images(chat_id) -> list[str]:
 	async with aiofiles.open(f"chats/{chat_id}/images.txt", encoding="utf-8") as f:
 		images = str(await f.read())
 		return [sample for sample in images.split(",") if sample != ""]
+
+async def random_image(chat_id: int, bot: Bot) -> BinaryIO:
+	"""Скачивание случайного изображения в BinaryIO
+
+	Args:
+		chat_id (int): id группового чата
+
+	Returns:
+		bytes | None: изображение, или None, если его не получилось скачать
+	"""
+	photos_model = await read_images(chat_id)
+	for _ in range(3):
+		file_id = random.choice(photos_model)
+		try:
+			return await bot.download(file=file_id)
+		except:
+			await delete_image(file_id, chat_id)
+	raise RandomImageNotFound
 	
 # Получение стикеров из файла, созданного под чат	
 async def read_stickers(chat_id) -> list[str]:

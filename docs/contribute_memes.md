@@ -16,7 +16,7 @@ async def generate_meme(chat_id):
 ```python
 if select == 17:
 	img = Image.open("./utils/resources/templates/17.jpg")
-	img_paste = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((355, 355))
+	img_paste = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((355, 355))
 
 	img.paste(img_paste, (-81, 201))
 
@@ -33,7 +33,7 @@ if select == 17:
 
 В `Image.open("./utils/resources/templates/17.jpg")` мы открываем файл шаблона
 
-Дальше открывается случайная картинка из чата (`await random_image(chat_id=chat_id)`) и изменяется по ширине и длине как вам нужно (`resize((355, 355))`)
+Дальше открывается случайная картинка из чата (`await random_image(chat_id=chat_id, bot=bot)`) и изменяется по ширине и длине как вам нужно (`resize((355, 355))`)
 
 Дальше с помощью `img.paste` происходит вставка картинки на шаблон. `(-81, 201)` являются координатами по x и y верхнего левого края картинки, которую вы хотите вставить. Для удобства просчитывания x, y картинки используйте Asperite/Libresprite.
 

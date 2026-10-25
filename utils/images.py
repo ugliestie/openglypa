@@ -4,14 +4,13 @@ from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
-from main import random_image
 from utils.chat_data import *
 from utils.text import generate_sentence, generate_sentences
 
 
 # Для демотиваторов использовался код библиотеки simpledemotivators
 # https://github.com/Infqq/simpledemotivators/blob/main/simpledemotivators/Demotivator.py
-async def generate_demotivator(chat_id: int, image: bytes) -> bytes:
+async def generate_demotivator(chat_id: int, image: BinaryIO) -> bytes:
 	"""Генерация демотиватора
 
 	Args:
@@ -67,7 +66,7 @@ async def generate_demotivator(chat_id: int, image: bytes) -> bytes:
 
 	return byte_io.read()
 
-async def generate_meme(chat_id: int) -> bytes:
+async def generate_meme(chat_id: int, bot: Bot) -> bytes:
 	"""Генерация мема
 
 	Args:
@@ -110,7 +109,7 @@ async def generate_meme(chat_id: int) -> bytes:
 	
 	if select == 2:
 		img = Image.open("./utils/resources/templates/2.jpg")
-		img_paste = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((639, 348))
+		img_paste = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((639, 348))
 
 		img.paste(img_paste)
 		
@@ -172,7 +171,7 @@ async def generate_meme(chat_id: int) -> bytes:
 	
 	if select == 4:
 		img = Image.open("./utils/resources/templates/4.jpg")
-		img_paste = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((1000, 538))
+		img_paste = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((1000, 538))
 
 		img.paste(img_paste, (0, 460))
 
@@ -186,7 +185,7 @@ async def generate_meme(chat_id: int) -> bytes:
 
 	if select == 5:
 		img = Image.open("./utils/resources/templates/5.jpg")
-		img_paste = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((426, 299))
+		img_paste = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((426, 299))
 
 		img.paste(img_paste, (520, 105))
 
@@ -462,34 +461,34 @@ async def generate_meme(chat_id: int) -> bytes:
 	if select == 12:
 		img = Image.open("./utils/resources/templates/12.jpg")
 
-		img_paste_0 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((210, 53))
+		img_paste_0 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((210, 53))
 		img.paste(img_paste_0, (146, 30))
 
-		img_paste_1 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((189, 132))
+		img_paste_1 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
 		img.paste(img_paste_1, (30, 134))
 
-		img_paste_2 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((189, 132))
+		img_paste_2 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
 		img.paste(img_paste_2, (235, 134))
 
-		img_paste_3 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((189, 132))
+		img_paste_3 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
 		img.paste(img_paste_3, (438, 134))
 
-		img_paste_4 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((189, 132))
+		img_paste_4 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
 		img.paste(img_paste_4, (30, 362))
 
-		img_paste_5 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((189, 132))
+		img_paste_5 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
 		img.paste(img_paste_5, (235, 362))
 
-		img_paste_6 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((189, 132))
+		img_paste_6 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
 		img.paste(img_paste_6, (438, 362))
 
-		img_paste_7 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((189, 132))
+		img_paste_7 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
 		img.paste(img_paste_7, (30, 579))
 
-		img_paste_8 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((189, 132))
+		img_paste_8 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
 		img.paste(img_paste_8, (235, 579))
 
-		img_paste_9 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((189, 132))
+		img_paste_9 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
 		img.paste(img_paste_9, (438, 579))
 
 		byte_io = BytesIO()
@@ -545,10 +544,10 @@ async def generate_meme(chat_id: int) -> bytes:
 	if select == 15:
 		img = Image.open("./utils/resources/templates/15.png")
 
-		img_paste_1 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((411, 259))
+		img_paste_1 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((411, 259))
 		img.paste(img_paste_1, (74, 34))
 
-		img_paste_2 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((277, 223))
+		img_paste_2 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((277, 223))
 		img.paste(img_paste_2, (501, 744))
 
 		byte_io = BytesIO()
@@ -562,7 +561,7 @@ async def generate_meme(chat_id: int) -> bytes:
 	if select == 16:
 		img = Image.open("./utils/resources/templates/16.png")
 		img_0 = Image.open("./utils/resources/templates/16.png")
-		img_paste_1 = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((581, 539))
+		img_paste_1 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((581, 539))
 		img.paste(img_paste_1, (594, 6))
 		img.paste(img_0, mask=img_0)
 
@@ -576,7 +575,7 @@ async def generate_meme(chat_id: int) -> bytes:
 
 	if select == 17:
 		img = Image.open("./utils/resources/templates/17.jpg")
-		img_paste = Image.open(await random_image(chat_id=chat_id)).convert("RGBA").resize((355, 355))
+		img_paste = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((355, 355))
 
 		img.paste(img_paste, (-81, 201))
   

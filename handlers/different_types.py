@@ -39,9 +39,9 @@ async def handle_albums(group: list[Message]):
 @router.message(StateFilter(None))
 async def handle_single(message: Message):
 	from database.requests import get_automatic_generations
-	from main import random_image
 	from utils.chat_data import (
 		delete_sticker,
+		random_image,
 		read_stickers,
 		write_images,
 		write_stickers,
@@ -66,7 +66,7 @@ async def handle_single(message: Message):
 					await message.answer(gen_message)
 				elif choice == 2:
 					try:
-						topor = await generate_topor(message.chat.id, await random_image(message.chat.id))
+						topor = await generate_topor(message.chat.id, await random_image(message.chat.id, message.bot))
 						await message.answer_photo(
 							photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 							caption=topor[0])
@@ -74,14 +74,14 @@ async def handle_single(message: Message):
 						logger.warning(f"Ошибка при автоматической генерации Топор 1+: {e!s}")
 				elif choice == 3:
 					try:
-						demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id))
+						demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id, message.bot))
 						await message.answer_photo(
 							photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 					except Exception as e:
 						logger.warning(f"Ошибка при автоматической генерации демотиватора: {e!s}")
 				elif choice == 4:
 					try:
-						meme = await generate_meme(message.chat.id)
+						meme = await generate_meme(message.chat.id, message.bot)
 						await message.answer_photo(
 							photo=BufferedInputFile(meme, filename="meme.jpg"))
 					except Exception as e:
