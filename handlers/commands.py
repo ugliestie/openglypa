@@ -9,7 +9,7 @@ from aiogram.utils.chat_member import ADMINS
 
 from database.requests import get_commands_settings
 from keyboards.settings import kb_settings_main
-from utils.chat_data import NoSamples
+from utils.chat_data import NoSamples, RandomImageNotFound
 from utils.text import FailedByTries, PossibleStartsNotFound
 
 logger = logging.getLogger(__name__)
@@ -131,6 +131,9 @@ async def generate_topor_message(message: Message):
 			logger.warning(str(e))
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу найти выражения, из которых можно что-то сгенерировать. Наверное, я не знаю слов, пообщайтесь, чтобы это исправить!")
 			return
+		except RandomImageNotFound:
+			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Не могу скачать случайную картинку... Либо я знаю мало картинок, или надо попробовать ещё раз")
+			return
 		except Exception as e:
 			logger.error(f"Ошибка при вызове h j t: {e!s}")
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я ничего не придума")
@@ -167,6 +170,9 @@ async def generate_demotivator_message(message: Message):
 			logger.warning(str(e))
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу найти выражения, из которых можно что-то сгенерировать. Наверное, я не знаю слов, пообщайтесь, чтобы это исправить!")
 			return
+		except RandomImageNotFound:
+			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Не могу скачать случайную картинку... Либо я знаю мало картинок, или надо попробовать ещё раз")
+			return
 		except FailedByTries:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу ничего придумать... Либо я знаю мало слов, или надо попробовать ещё раз")
 			return
@@ -191,6 +197,9 @@ async def generate_meme_message(message: Message):
 		except NoSamples:
 			logger.warning(str(e))
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу найти выражения, из которых можно что-то сгенерировать. Наверное, я не знаю слов, пообщайтесь, чтобы это исправить!")
+			return
+		except RandomImageNotFound:
+			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Не могу скачать случайную картинку... Либо я знаю мало картинок, или надо попробовать ещё раз")
 			return
 		except FailedByTries:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу ничего придумать... Либо я знаю мало слов, или надо попробовать ещё раз")
