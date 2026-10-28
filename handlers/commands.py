@@ -1,6 +1,5 @@
 import logging
 import random
-from functools import lru_cache
 from pathlib import Path
 
 from aiogram import F, Router
@@ -40,7 +39,6 @@ async def cmd_start(message: Message):
 		elif (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is None or message.from_user.is_bot is False):
 			await message.reply("Привет, я Openglypa! <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> \nЯ анализирую сообщения в групповом чате и генерирую на его основе контент. \nНастрой меня с помощью команды <code>h j s</code> и узнай мои команды с помощью команды <code>h j h</code>!")
 
-@lru_cache
 def get_commit():
 	try:
 		head_name = Path("./.git", 'HEAD').read_text().split('\n')[0].split(' ')[-1]
