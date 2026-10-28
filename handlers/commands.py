@@ -46,9 +46,9 @@ def get_commit():
 		head_name = Path("./.git", 'HEAD').read_text().split('\n')[0].split(' ')[-1]
 		head_ref = Path("./.git",head_name)
 		commit = head_ref.read_text().replace('\n','')
-		return f"<a href=https://github.com/ugliestie/openglypa/commit/{commit}>запущено {commit[7:]}</a>"
+		return f"""бот выполняется из <a href="https://github.com/ugliestie/openglypa/commit/{commit}">{commit[:7]}@openglypa</a>"""
 	except FileNotFoundError:
-		return 'Бот выполняется не из репозитория'
+		return 'бот выполняется не из репозитория'
 
 @router.message(F.text.lower() == ('h j h'))
 @router.message(Command("help"))
