@@ -96,7 +96,7 @@ def generate(samples: list[str], tries_count: int, size: int = 0, chars_count: i
 				return str_result
 
 		elif size == 0:
-			if 2 <= len(result) <= 100:
+			if 2 <= len(result) <= 100 and len(str_result) <= 100:
 				return str_result
 
 		elif size == 1:
