@@ -1,5 +1,7 @@
 import logging
 import random
+from functools import lru_cache
+from pathlib import Path
 
 from aiogram import F, Router
 from aiogram.exceptions import TelegramBadRequest
@@ -9,6 +11,7 @@ from aiogram.utils.chat_member import ADMINS
 
 from database.requests import get_commands_settings
 from keyboards.settings import kb_settings_main
+from keyboards.start import kb_add
 from utils.chat_data import NoSamples, RandomImageNotFound
 from utils.text import FailedByTries, PossibleStartsNotFound
 
@@ -17,7 +20,7 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 class NoBot(BaseException):
-    pass
+	pass
 
 class CantDownloadFileException(Exception):
 	pass
@@ -30,10 +33,21 @@ async def is_message_admin(message: Message, user_id : int) -> bool:
 
 @router.message(Command("start"))
 async def cmd_start(message: Message):
-	if message.chat.type == 'private':
-		await message.reply("Привет, я Openglypa! <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> \nЯ анализирую сообщения в групповом чате и генерирую на его основе контент. \nДобавь меня в групповой чат и я начну учиться вашей группе!")
-	elif (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is None or message.from_user.is_bot is False):
-		await message.reply("Привет, я Openglypa! <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> \nЯ анализирую сообщения в групповом чате и генерирую на его основе контент. \nНастрой меня с помощью команды <code>h j s</code> и узнай мои команды с помощью команды <code>h j h</code>!")
+	if message.bot:
+		if message.chat.type == 'private':
+			await message.reply(text="Привет, я Openglypa! <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> \nЯ анализирую сообщения в групповом чате и генерирую на его основе контент. \nДобавь меня в групповой чат и я начну учиться вашей группе!",
+								reply_markup=kb_add((await message.bot.get_me()).username))
+		elif (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is None or message.from_user.is_bot is False):
+			await message.reply("Привет, я Openglypa! <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> \nЯ анализирую сообщения в групповом чате и генерирую на его основе контент. \nНастрой меня с помощью команды <code>h j s</code> и узнай мои команды с помощью команды <code>h j h</code>!")
+
+@lru_cache
+def get_commit():
+	try:
+		head_name = Path("./.git", 'HEAD').read_text().split('\n')[0].split(' ')[-1]
+		head_ref = Path("./.git",head_name)
+		return head_ref.read_text().replace('\n','')
+	except FileNotFoundError:
+		return 'Бот выполняется не из репозитория'
 
 @router.message(F.text.lower() == ('h j h'))
 @router.message(Command("help"))
@@ -51,7 +65,8 @@ async def cmd_help(message: Message):
 						"""<code>h j s</code> - настройки бота\n"""
 						"""<code>h j del</code> - удалить изображение/стикер из базы данных бота\n"""
 						"""<code>h j stats</code> - статистика базы данных чата\n"""
-						"""<code>h j h</code> - эта справка""")
+						"""<code>h j h</code> - эта справка\n\n"""
+	  					+ get_commit())
 
 @router.message(F.text.lower().startswith('h j g'))
 async def force_generate(message: Message):
@@ -114,7 +129,7 @@ async def generate_topor_message(message: Message):
 					text = message.reply_to_message.caption.capitalize()
 			else:
 				image = await random_image(message.chat.id, message.bot)
-     
+	 
 			if image == None:
 				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Не могу найти изображение, чтобы сгенерировать Топо")
 			else:
@@ -123,7 +138,7 @@ async def generate_topor_message(message: Message):
 				await message.reply_photo(
 					photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 					caption=topor[0])
-    
+	
 		except TelegramBadRequest as e:
 			if "not enough rights" in str(e):
 				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу придумать из-за того, что мне нельзя отправлять изображе")
@@ -167,7 +182,6 @@ async def generate_demotivator_message(message: Message):
 			if "not enough rights" in str(e):
 				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу надемотивировать из-за того, что мне нельзя отправлять изображения")
 		except NoSamples:
-			logger.warning(str(e))
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу найти выражения, из которых можно что-то сгенерировать. Наверное, я не знаю слов, пообщайтесь, чтобы это исправить!")
 			return
 		except RandomImageNotFound:
@@ -195,7 +209,6 @@ async def generate_meme_message(message: Message):
 			if "not enough rights" in str(e):
 				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу намемить из-за того, что мне нельзя отправлять изображения")
 		except NoSamples:
-			logger.warning(str(e))
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу найти выражения, из которых можно что-то сгенерировать. Наверное, я не знаю слов, пообщайтесь, чтобы это исправить!")
 			return
 		except RandomImageNotFound:
@@ -240,7 +253,6 @@ async def generate_poll_message(message: Message):
 			else:
 				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я не смог придумать опрос")
 		except NoSamples:
-			logger.warning(str(e))
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу найти выражения, из которых можно что-то сгенерировать. Наверное, я не знаю слов, пообщайтесь, чтобы это исправить!")
 			return
 		except FailedByTries:
