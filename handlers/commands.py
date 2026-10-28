@@ -1,6 +1,5 @@
 import logging
 import random
-from pathlib import Path
 
 from aiogram import F, Router
 from aiogram.exceptions import TelegramBadRequest
@@ -39,20 +38,12 @@ async def cmd_start(message: Message):
 		elif (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is None or message.from_user.is_bot is False):
 			await message.reply("Привет, я Openglypa! <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> \nЯ анализирую сообщения в групповом чате и генерирую на его основе контент. \nНастрой меня с помощью команды <code>h j s</code> и узнай мои команды с помощью команды <code>h j h</code>!")
 
-def get_commit():
-	try:
-		head_name = Path("./.git", 'HEAD').read_text().split('\n')[0].split(' ')[-1]
-		head_ref = Path("./.git",head_name)
-		commit = head_ref.read_text().replace('\n','')
-		return f"""бот выполняется из <a href="https://github.com/ugliestie/openglypa/commit/{commit}">{commit[:7]}@openglypa</a>"""
-	except FileNotFoundError:
-		return 'бот выполняется не из репозитория'
-
 @router.message(F.text.lower() == ('h j h'))
 @router.message(Command("help"))
 async def cmd_help(message: Message):
+	from main import state
 	await message.reply("""<b>Справка Openglypa <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji></b>\n\n"""
-						"""<code>h j g</code> - генерация текста\n"""
+						"""<blockquote expandable><code>h j g</code> - генерация текста\n"""
 						"""<code>h j g l</code> - генерация длинного текста\n"""
 						"""<code>h j g 100</code> - генерация текста размером около 100 символов\n"""
 						"""<code>h j g привет</code> - генерация текста с началом "привет"\n"""
@@ -64,8 +55,8 @@ async def cmd_help(message: Message):
 						"""<code>h j s</code> - настройки бота\n"""
 						"""<code>h j del</code> - удалить изображение/стикер из базы данных бота\n"""
 						"""<code>h j stats</code> - статистика базы данных чата\n"""
-						"""<code>h j h</code> - эта справка\n\n"""
-	  					+ get_commit())
+						"""<code>h j h</code> - эта справка</blockquote>\n\n"""
+	  					+ state)
 
 @router.message(F.text.lower().startswith('h j g'))
 async def force_generate(message: Message):
