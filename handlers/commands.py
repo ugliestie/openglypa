@@ -45,7 +45,8 @@ def get_commit():
 	try:
 		head_name = Path("./.git", 'HEAD').read_text().split('\n')[0].split(' ')[-1]
 		head_ref = Path("./.git",head_name)
-		return head_ref.read_text().replace('\n','')
+		commit = head_ref.read_text().replace('\n','')
+		return f"<a href=https://github.com/ugliestie/openglypa/commit/{commit}>запущено {commit[7:]}</a>"
 	except FileNotFoundError:
 		return 'Бот выполняется не из репозитория'
 
