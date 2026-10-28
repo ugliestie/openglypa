@@ -17,7 +17,8 @@ FORMAT = "%(message)s"
 logging.basicConfig(
 	level="WARNING", format=FORMAT, datefmt="[%X]", handlers=[RichHandler(
 				rich_tracebacks=True,
-				tracebacks_show_locals=True,
+				# tracebacks_show_locals=True, # разкоменчивать только в случае если надо, а то вывод бешеный
+				tracebacks_max_frames=1,
 				show_time=False)]
 )
 
