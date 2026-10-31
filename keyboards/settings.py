@@ -71,7 +71,9 @@ def kb_settings_generate_types_automatic(settings):
             InlineKeyboardButton(text=f"Опросы | {marker(settings[4])}", callback_data='type_automatic_polls'),
             InlineKeyboardButton(text=f"Реакции | {marker(settings[5])}", callback_data='type_automatic_reactions')
         ],
-        [InlineKeyboardButton(text=f"Стикеры | {marker(settings[6])}", callback_data='type_automatic_stickers')],
+        [   InlineKeyboardButton(text=f"Стикеры | {marker(settings[6])}", callback_data='type_automatic_stickers'),
+            InlineKeyboardButton(text=f"Гифки | {marker(settings[7])}", callback_data='type_automatic_animations')
+        ],
         [InlineKeyboardButton(text="◀️ Назад", callback_data='generate_types')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)

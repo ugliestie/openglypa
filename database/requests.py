@@ -40,7 +40,7 @@ async def get_commands_settings(group_id: int) -> tuple[bool, bool, bool, bool, 
         else:
             return (group.text, group.topor, group.demotivators, group.memes, group.polls, group.hm)
         
-async def get_automatic_settings(group_id: int) -> tuple[bool, bool, bool, bool, bool, bool, bool]:
+async def get_automatic_settings(group_id: int) -> tuple[bool, bool, bool, bool, bool, bool, bool, bool]:
     """Получение списка включенных/выключенных автоматических генераций
 
     Args:
@@ -50,7 +50,7 @@ async def get_automatic_settings(group_id: int) -> tuple[bool, bool, bool, bool,
         GroupNotFound: группы нет в базе данных
 
     Returns:
-        tuple[bool, bool, bool, bool, bool, bool, bool]: список включенных/выключенных генераций по типам text, topor, demotivators, memes, polls, reactions, stickers
+        tuple[bool, bool, bool, bool, bool, bool, bool]: список включенных/выключенных генераций по типам text, topor, demotivators, memes, polls, reactions, stickers, animations
     """
     async with async_session() as session:
         group = await session.scalar(select(AutomaticSettings).where(AutomaticSettings.group_id == str(group_id)))
@@ -58,9 +58,9 @@ async def get_automatic_settings(group_id: int) -> tuple[bool, bool, bool, bool,
         if group is None:
             raise GroupNotFound
         else:
-            return (group.text, group.topor, group.demotivators, group.memes, group.polls, group.reactions, group.stickers)       
+            return (group.text, group.topor, group.demotivators, group.memes, group.polls, group.reactions, group.stickers, group.animations)       
 
-async def get_automatic_generations(group_id: int) -> tuple[int, bool, bool, bool, bool, bool, bool, bool]:
+async def get_automatic_generations(group_id: int) -> tuple[int, bool, bool, bool, bool, bool, bool, bool, bool]:
     """Получение списка из значения лени и включенных/выключенных автоматических генераций
 
     Args:
@@ -70,7 +70,7 @@ async def get_automatic_generations(group_id: int) -> tuple[int, bool, bool, boo
         GroupNotFound: группы нет в базе данных
 
     Returns:
-        tuple[int, bool, bool, bool, bool, bool, bool, bool]: список из лени в процентах и включенных/выключенных генераций по типам text, topor, demotivators, memes, polls, reactions, stickers
+        tuple[int, bool, bool, bool, bool, bool, bool, bool, bool]: список из лени в процентах и включенных/выключенных генераций по типам text, topor, demotivators, memes, polls, reactions, stickers, animations
     """
     async with async_session() as session:
         group = await session.scalar(select(AutomaticSettings).where(AutomaticSettings.group_id == str(group_id)))
@@ -78,14 +78,14 @@ async def get_automatic_generations(group_id: int) -> tuple[int, bool, bool, boo
         if group is None:
             raise GroupNotFound
         else:
-            return (group.lazyness, group.text, group.topor, group.demotivators, group.memes, group.polls, group.reactions, group.stickers) 
+            return (group.lazyness, group.text, group.topor, group.demotivators, group.memes, group.polls, group.reactions, group.stickers, group.animations) 
 
 async def set_setting(type_setting: str, kind_setting: str, setting: bool, group_id: int) -> None:
     """Сменить значение настройки
 
     Args:
         type_setting (str): commands, automatic
-        kind_setting (str): тип контента (text, topor, demotivators, memes, polls, reactions, stickers)
+        kind_setting (str): тип контента (text, topor, demotivators, memes, polls, reactions, stickers, animations, hm)
         setting (bool): True, если включить и False, если выключить
         group_id (int): id группового чата
 
@@ -115,6 +115,8 @@ async def set_setting(type_setting: str, kind_setting: str, setting: bool, group
                 group.reactions = setting
             elif type(group) is AutomaticSettings and kind_setting == "stickers":
                 group.stickers = setting
+            elif type(group) is AutomaticSettings and kind_setting == "animations":
+                group.animations = setting
             elif type(group) is CommandsSettings and kind_setting == "hm":
                 group.hm = setting
             await session.commit()

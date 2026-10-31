@@ -19,6 +19,8 @@ class NoSamples(Exception):
 			return "Нет file_id изображений в файле чата"
 		elif self.type == "stickers":
 			return "Нет file_id стикеров в файле чата"
+		elif self.type == "animations":
+			return "Нет file_id анимаций в файле чата"
 
 class RandomImageNotFound(BaseException):
 	pass
@@ -122,6 +124,18 @@ async def write_stickers(chat_id: int, file_id: str):
 		os.mkdir(f"chats/{chat_id}")
 	async with aiofiles.open(f"chats/{chat_id}/stickers.txt", "a", encoding="utf-8") as f:
 		await f.write(file_id + ",")
+  
+async def write_animations(chat_id: int, file_id: str) -> None:
+	"""Запись file_id стикеров в файл, созданный под чат
+
+	Args:
+		chat_id (int): id группового чата
+		file_id (str): id файла, лежащего на сервере Telegram
+	"""
+	if not os.path.exists(f"chats/{chat_id}"):
+		os.mkdir(f"chats/{chat_id}")
+	async with aiofiles.open(f"chats/{chat_id}/gifs.txt", "a", encoding="utf-8") as f:
+		await f.write(file_id + ",")
 
 async def read_words(chat_id: int) -> list[str]:
 	"""Получение слов и выражений из файла, созданного под чат
@@ -140,7 +154,7 @@ async def read_words(chat_id: int) -> list[str]:
 		else:
 			return samples
 	
-async def read_images(chat_id) -> list[str]:
+async def read_images(chat_id: int) -> list[str]:
 	"""Получение изображений из файла, созданного под чат
 
 	Args:
@@ -156,6 +170,24 @@ async def read_images(chat_id) -> list[str]:
 			raise NoSamples('images')
 		else:
 			return samples
+
+async def read_animations(chat_id: int) -> list[str]:
+	"""Получение анимаций из файла, созданного под чат
+
+	Args:
+		chat_id (_type_): id группового чата
+
+	Returns:
+		list[str]: лист id файлов, лежащих на сервере Telegram
+	"""
+	async with aiofiles.open(f"chats/{chat_id}/gifs.txt", encoding="utf-8") as f:
+		animations = await f.read()
+		samples = [sample for sample in animations.split(",") if sample != ""]
+		if not samples:
+			raise NoSamples('animations')
+		else:
+			return samples
+
 
 async def random_image(chat_id: int, bot: Bot) -> BinaryIO:
 	"""Скачивание случайного изображения в BinaryIO
@@ -213,3 +245,12 @@ async def delete_sticker(file_id, chat_id) -> None:
 		chat_id (_type_): id группового чата
 	"""
 	filereplace(f"chats/{chat_id}/stickers.txt",f"{file_id},","")
+ 
+async def delete_animation(file_id, chat_id) -> None:
+	"""Удаление из файла стикеров, к которому невозможно получить доступ
+
+	Args:
+		file_id (_type_): id файла, лежащего на сервере Telegram
+		chat_id (_type_): id группового чата
+	"""
+	filereplace(f"chats/{chat_id}/gifs.txt",f"{file_id},","")

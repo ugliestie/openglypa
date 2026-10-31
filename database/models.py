@@ -40,6 +40,7 @@ class AutomaticSettings(Base):
     polls = mapped_column(Boolean, default=True)
     reactions = mapped_column(Boolean, default=True)
     stickers = mapped_column(Boolean, default=True)
+    animations = mapped_column(Boolean, default=True)
     
 
 

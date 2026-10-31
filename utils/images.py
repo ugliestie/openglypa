@@ -75,7 +75,7 @@ async def generate_meme(chat_id: int, bot: Bot) -> bytes:  # ty: ignore[invalid-
 	Returns:
 		bytes: готовый мем
 	"""
-	select = random.randint(1, 22)
+	select = random.randint(1, 23)
 
 	if select == 1:
 		img = Image.open("./utils/resources/templates/1.jpg")
@@ -805,6 +805,28 @@ async def generate_meme(chat_id: int, bot: Bot) -> bytes:  # ty: ignore[invalid-
 		byte_io.name = 'image.jpg'
 
 		img.save(byte_io, 'JPEG')
+		byte_io.seek(0)
+
+		return byte_io.read()
+
+	if select == 23:
+		img = Image.new('RGB', (735, 717), color='white')
+		img_template = Image.open("./utils/resources/templates/23.png").convert("RGBA")
+		img_paste_1 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((365, 365))
+		img_paste_2 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((365, 365))
+		img_paste_3 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((365, 365))
+		img_paste_4 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((365, 365))
+
+		img.paste(img_paste_1, (0, 0))
+		img.paste(img_paste_2, (370, 0))
+		img.paste(img_paste_3, (0, 370))
+		img.paste(img_paste_4, (370, 370))
+		img.paste(img_template, (0,0), img_template)
+  
+		byte_io = BytesIO()
+		byte_io.name = 'image.png'
+		
+		img.save(byte_io, 'PNG')
 		byte_io.seek(0)
 
 		return byte_io.read()

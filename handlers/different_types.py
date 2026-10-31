@@ -38,14 +38,18 @@ async def handle_albums(group: list[Message]):
 				await write_words(msg.caption, group[0].chat.id)
 	else:
 		return
-	
+
 @router.message(StateFilter(None))
 async def handle_single(message: Message):
 	from database.requests import get_automatic_generations
+	from handlers.errors import handle_rights
 	from utils.chat_data import (
+		delete_animation,
 		delete_sticker,
 		random_image,
+		read_animations,
 		read_stickers,
+		write_animations,
 		write_images,
 		write_stickers,
 		write_words,
@@ -60,8 +64,8 @@ async def handle_single(message: Message):
 			os.mkdir(f"chats/{message.chat.id}")
 		
 		generation = await get_automatic_generations(message.chat.id)
-		if generation[0] != 100 and chance_hit(generation[0]):
-			set_generations = [i for i in range(1, 8) if generation[i] == 1]
+		set_generations = [i for i in range(1, 9) if generation[i] == 1]
+		if set_generations and generation[0] != 100 and chance_hit(generation[0]):
 			choice = random.choice(set_generations)
 			if choice == 1:
 				gen_message = await generate_sentence(message.chat.id, size=2)
@@ -72,6 +76,9 @@ async def handle_single(message: Message):
 					await message.answer_photo(
 						photo=BufferedInputFile(topor[1], filename="topor.jpg"),
 						caption=topor[0])
+				except TelegramBadRequest as e:
+					if "not enough rights" in str(e):
+						await handle_rights(message, 'automatic', 'topor')
 				except Exception as e:
 					logger.warning(f"Ошибка при автоматической генерации Топор 1+: {e!s}")
 			elif choice == 3:
@@ -79,6 +86,9 @@ async def handle_single(message: Message):
 					demotivator = await generate_demotivator(message.chat.id, await random_image(message.chat.id, message.bot))
 					await message.answer_photo(
 						photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
+				except TelegramBadRequest as e:
+					if "not enough rights" in str(e):
+						await handle_rights(message, 'automatic', 'demotivators')
 				except Exception as e:
 					logger.warning(f"Ошибка при автоматической генерации демотиватора: {e!s}")
 			elif choice == 4:
@@ -86,25 +96,34 @@ async def handle_single(message: Message):
 					meme = await generate_meme(message.chat.id, message.bot)
 					await message.answer_photo(
 						photo=BufferedInputFile(meme, filename="meme.jpg"))
+				except TelegramBadRequest as e:
+					if "not enough rights" in str(e):
+						await handle_rights(message, 'automatic','memes')
 				except Exception as e:
 					logger.warning(f"Ошибка при автоматической генерации мема: {e!s}")
 			elif choice == 5:
 				try:
 					await message.answer_poll(
 					question=await generate_sentence(message.chat.id),
-					options=await generate_sentences(message.chat.id, random.randint(3,6)),
+					options=await generate_sentences(message.chat.id, random.randint(3,6)),  # ty: ignore[invalid-argument-type]
 					explanation=await generate_sentence(message.chat.id),
 					is_anonymous=False,
 					)
+				except TelegramBadRequest as e:
+					if "not enough rights" in str(e):
+						await handle_rights(message, 'automatic', 'polls')
 				except Exception as e:
-					logger.warning(f"Ошибка при автоматической генерации опроса: {e!s}")
+					logger.warning(f"Ошибка при автоматической генераwии опроса: {e!s}")
 			elif choice == 6:
 				try:
 					set_reactions = ["❤", "👍", "👎", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"]
 					react = ReactionTypeEmoji(emoji=random.choice(set_reactions))
 					await message.react([react])
+				except TelegramBadRequest as e:
+					if "not enough rights" in str(e):
+						await handle_rights(message, 'automatic', 'reactions')
 				except Exception as e:
-					logger.warning(f"Ошибка при автоматической генерации стикера: {e!s}")
+					logger.warning(f"Ошибка при автоматическом проставлении реакции: {e!s}")
 			elif choice == 7:
 				try:
 					sticker = random.choice(await read_stickers(message.chat.id))
@@ -112,12 +131,26 @@ async def handle_single(message: Message):
 						sticker=sticker
 					)
 				except TelegramBadRequest as e:
-					if "not enough rights" in str(e):
-						await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу прислать стикер из-за того, что мне нельзя их отправлять.</b><br><br>Я больше не буду пытаться. Чтобы исправить это, разрешите боту присылать стикеры и в настройках бота включите их автоматическое присылание.")
+					if "not enough rights" in str(e.message):
+						await handle_rights(message, 'automatic', 'stickers')
 					else:
 						await delete_sticker(sticker, message.chat.id)
 				except Exception as e:
 					logger.warning(f"Ошибка при автоматической генерации стикера: {e!s}")
+			elif choice == 8:
+				try:
+					animation = random.choice(await read_animations(message.chat.id))
+					await message.answer_animation(
+						animation=animation
+					)
+				except TelegramBadRequest as e:
+					if "not enough rights" in str(e.message):
+						await handle_rights(message, 'automatic', 'animations')
+					else:
+						await delete_animation(animation, message.chat.id)
+				except Exception as e:
+					logger.warning(f"Ошибка при автоматической генерации гифки: {e!s}")
+
 		
 		if message.text is not None and not re.findall(link_pattern, message.text) and not re.findall(commands_pattern, message.text):
 			await write_words(message.text, message.chat.id)
@@ -145,7 +178,9 @@ async def handle_single(message: Message):
 		
 		if message.caption is not None and not re.findall(link_pattern, message.caption) and not re.findall(commands_pattern, message.caption):
 			await write_words(message.caption, message.chat.id)
-		elif message.sticker is not None:
+		if message.sticker is not None:
 			await write_stickers(message.chat.id, message.sticker.file_id)
+		if message.animation is not None:
+			await write_animations(message.chat.id, message.animation.file_id)
 	else:
 		return

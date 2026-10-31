@@ -104,6 +104,8 @@ async def process_callback_generate_types(callback: CallbackQuery):
 					await set_setting("automatic", "reactions", not(setting[5]), callback.message.chat.id)
 				elif callback.data == "type_automatic_stickers":
 					await set_setting("automatic", "stickers", not(setting[6]), callback.message.chat.id)
+				elif callback.data == "type_automatic_animations":
+					await set_setting("automatic", "animations", not(setting[7]), callback.message.chat.id)
 				await callback.message.edit_text(
 						text="⚙️ Настройки типов контента, который присылает бот автоматически",
 						reply_markup=kb_settings_generate_types_automatic(await get_automatic_settings(callback.message.chat.id))

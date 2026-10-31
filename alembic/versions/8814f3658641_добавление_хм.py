@@ -27,7 +27,7 @@ def upgrade() -> None:
                nullable=False)
 
     with op.batch_alter_table('group_commands_settings', schema=None) as batch_op:
-        batch_op.add_column(sa.Column('hm', sa.Boolean(), nullable=True, default=1))
+        batch_op.add_column(sa.Column('hm', sa.Boolean(), nullable=True, default=1, server_default="1"))
         batch_op.alter_column('group_id',
                existing_type=sa.TEXT(),
                nullable=False)

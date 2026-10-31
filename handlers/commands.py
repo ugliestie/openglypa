@@ -8,6 +8,7 @@ from aiogram.types import BufferedInputFile, Message, ReactionTypeEmoji
 from aiogram.utils.chat_member import ADMINS
 
 from database.requests import get_commands_settings
+from handlers.errors import handle_rights
 from keyboards.settings import kb_settings_main
 from keyboards.start import kb_add
 from utils.chat_data import NoSamples, RandomImageNotFound
@@ -131,8 +132,7 @@ async def generate_topor_message(message: Message):
 	
 		except TelegramBadRequest as e:
 			if "not enough rights" in str(e):
-				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу придумать из-за того, что мне нельзя отправлять изображе")
-		except NoSamples as e:
+				await handle_rights(message, 'commands', 'topor')
 			logger.warning(str(e))
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу найти выражения, из которых можно что-то сгенерировать. Наверное, я не знаю слов, пообщайтесь, чтобы это исправить!")
 			return
@@ -170,7 +170,7 @@ async def generate_demotivator_message(message: Message):
 					photo=BufferedInputFile(demotivator, filename="demotivator.jpg"))
 		except TelegramBadRequest as e:
 			if "not enough rights" in str(e):
-				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу надемотивировать из-за того, что мне нельзя отправлять изображения")
+				await handle_rights(message, 'automatic', 'demotivators')
 		except NoSamples:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу найти выражения, из которых можно что-то сгенерировать. Наверное, я не знаю слов, пообщайтесь, чтобы это исправить!")
 			return
@@ -197,7 +197,7 @@ async def generate_meme_message(message: Message):
 				photo=BufferedInputFile(meme, filename="meme.jpg"))
 		except TelegramBadRequest as e:
 			if "not enough rights" in str(e):
-				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу намемить из-за того, что мне нельзя отправлять изображения")
+				await handle_rights(message, 'commands', 'memes')
 		except NoSamples:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу найти выражения, из которых можно что-то сгенерировать. Наверное, я не знаю слов, пообщайтесь, чтобы это исправить!")
 			return
@@ -239,7 +239,7 @@ async def generate_poll_message(message: Message):
 				)
 		except TelegramBadRequest as e:
 			if "not enough rights" in str(e):
-				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я не могу намемить из-за того, что мне нельзя отправлять опросы")
+				await handle_rights(message, 'commands', 'polls')
 			else:
 				await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и я не смог придумать опрос")
 		except NoSamples:
@@ -272,18 +272,23 @@ async def cmd_settings(message: Message):
 # TODO: добавить банлист для стикеров
 @router.message(F.text.lower() == 'h j del')
 async def cmd_delete(message: Message):
-	from utils.chat_data import delete_image, delete_sticker
-	if message.bot and (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is not None and message.from_user.is_bot is False):
+	from utils.chat_data import delete_animation, delete_image, delete_sticker
+	if message.bot and (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is not None and message.from_user.is_bot is False) and type(message.reply_to_message) is Message:
 		if await is_message_admin(message, message.from_user.id):
-			if message.photo:
-				await delete_image(message.photo[-1].file_id, message.chat.id)
+			if message.reply_to_message.photo:
+				await delete_image(message.reply_to_message.photo[-1].file_id, message.chat.id)
 				await message.reply(
 					"Изображение удалено из базы данных бота"
 				)
-			elif message.sticker:
-				await delete_sticker(message.sticker.file_id, message.chat.id)
+			elif message.reply_to_message.sticker:
+				await delete_sticker(message.reply_to_message.sticker.file_id, message.chat.id)
 				await message.reply(
 					"Стикер удалён из базы данных бота"
+				)
+			elif message.reply_to_message.animation:
+				await delete_animation(message.reply_to_message.animation.file_id, message.chat.id)
+				await message.reply(
+					"Гифка удалена из базы данных бота"
 				)
 		else:
 			await message.reply(
