@@ -7,7 +7,7 @@ import os
 from utils.chat_data import read_words, write_words
 
 chats = [int(n) for n in os.listdir("chats") if os.path.isdir(os.path.join("chats", n))]
-  
+print("привет! процесс оптимизации может занять до 30 секунд! \033[93mКруто погнали\033[0m") # ОЧЕНЬ важно что этот текст ЖЁЛТЕНЬКОГО ЦВЕТА!!!!!!!!!!
 async def main():
 	for chat in chats:
 		samples = await read_words(chat)
@@ -17,3 +17,4 @@ async def main():
 
 if __name__ == "__main__":
 	asyncio.run(main())
+print("круто! готово! можешь запускать main.py")
