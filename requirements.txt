@@ -9,4 +9,3 @@ aiosqlite
 alembic
 rich
 aiofiles
-
