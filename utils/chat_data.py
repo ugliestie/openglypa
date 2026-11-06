@@ -49,6 +49,28 @@ async def write_words(text: str, chat_id: int) -> None:
 	else:
 		pass
   
+
+async def yaoi(text: str, chat_id: int) -> None:
+	"""Запись слов и выражений в файл, созданный под чат
+
+	Args:
+		text (str): текст сообщения
+		chat_id (int): id группового чата
+	"""
+	if not os.path.exists(f"chats/{chat_id}"):
+		os.mkdir(f"chats/{chat_id}")
+	if not await check_ban_words(text, chat_id):
+		async with aiofiles.open(f"chats/{chat_id}/text.txt", "a", encoding="utf-8") as f:
+			while '  ' in text.strip():
+				text = text.replace("  ", " ")
+			text = " ".join([word for word in text.split() if word not in string.punctuation])
+			if len(text.split()) > 2:
+				text = text.casefold()
+				text = text.replace("\n", ". ").replace("\n\n", ". ")
+				await f.write(text + ",")
+	else:
+		pass
+
 async def write_ban_words(text: str, chat_id: int) -> None:
 	"""Добавление слов и выражений в файл, созданный под чат, сообщения с которыми не будут добавляться в базу данных чата
 
@@ -254,3 +276,4 @@ async def delete_animation(file_id, chat_id) -> None:
 		chat_id (_type_): id группового чата
 	"""
 	filereplace(f"chats/{chat_id}/gifs.txt",f"{file_id},","")
+
