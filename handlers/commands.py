@@ -4,8 +4,10 @@ import random
 from aiogram import F, Router
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
-from aiogram.types import BufferedInputFile, Message, ReactionTypeEmoji
+from aiogram.methods import GetFile
+from aiogram.types import BufferedInputFile, Message, ReactionTypeEmoji, URLInputFile, LinkPreviewOptions
 from aiogram.utils.chat_member import ADMINS
+from aiogram.utils.markdown import hlink
 
 from database.requests import get_commands_settings
 from handlers.errors import handle_rights
@@ -213,6 +215,31 @@ async def generate_meme_message(message: Message):
 	else:
 		return
 
+@router.message(F.text.lower().startswith('h j booru'))
+async def generate_yaoi_message(message: Message):
+	from utils.booru import random_booru
+	if message.bot and (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is None or message.from_user.is_bot is False) and (await get_commands_settings(message.chat.id))[3] == 1:
+		try:
+			arg = message.text[10:]
+			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
+			response = random_booru(arg)
+			image_url = response[0]
+			url = response[1]
+			if 'yaoi' in message.text.lower():
+				await message.reply(f"""🚨🚨🚨🚨yaoi detected🚨🚨🚨🚨 \n<a href="{url}">source</a>""",
+								link_preview_options=LinkPreviewOptions(url=image_url, show_above_text=True))
+			elif 'yuri' in message.text.lower():
+					await message.reply(f"""🚨🚨🚨🚨yuri detected🚨🚨🚨🚨 \n<a href="{url}">source</a>""",
+								link_preview_options=LinkPreviewOptions(url=image_url, show_above_text=True))
+		except TelegramBadRequest as e:
+			if "not enough rights" in str(e):
+				await handle_rights(message, 'commands')
+		except Exception as e:
+			await message.reply("ай! по тегу ничего не найдено :(")
+	else:
+		return
+# I'm so fucking good at this job ... (Kira optimized everything and I wrote funny names for variables and bruteforced shitty code. This is how coding should be)
+
 @router.message(F.text.lower() == 'h j p')
 async def generate_poll_message(message: Message):
 	from utils.text import generate_sentence, generate_sentences
@@ -336,7 +363,7 @@ async def generate_reply(message: Message):
 	if message.bot and (message.chat.type == 'group' or message.chat.type == 'supergroup') \
 	and (message.from_user is None or message.from_user.is_bot is False) \
 	and (await get_commands_settings(message.chat.id))[5] == 1:
-		yn = random.randint(1, 10)
+		yn = random.randint(1, 11)
 		if yn == 1:
 			await message.reply('Неее...')
 		if yn == 2:
@@ -360,4 +387,8 @@ async def generate_reply(message: Message):
 		if yn == 10:
 			await message.reply('да давай ура даааааа')
 	else:
+<<<<<<< Updated upstream
 		return
+=======
+		return
+>>>>>>> Stashed changes
