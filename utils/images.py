@@ -75,7 +75,7 @@ async def generate_meme(chat_id: int, bot: Bot) -> bytes:  # ty: ignore[invalid-
 	Returns:
 		bytes: готовый мем
 	"""
-	select = random.randint(22, 23)
+	select = random.randint(1, 23)
 
 	if select == 1:
 		img = Image.open("./utils/resources/templates/1.jpg")
