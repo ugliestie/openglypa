@@ -220,9 +220,10 @@ async def generate_meme_message(message: Message):
 
 @router.message(F.text.lower().startswith('h j booru'))
 async def generate_yaoi_message(message: Message):
+	from json import JSONDecodeError
 	from urllib.error import HTTPError
 
-	from utils.booru import BooruNotFoundError, random_booru
+	from utils.booru import random_booru
 	if message.bot and (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is None or message.from_user.is_bot is False) and (await get_commands_settings(message.chat.id))[3] == 1 and type:
 		try:
 			arg = message.text[10:]
@@ -249,7 +250,7 @@ async def generate_yaoi_message(message: Message):
 		except TelegramBadRequest as e:
 			if "not enough rights" in str(e):
 				await handle_rights(message, 'commands', 'boorou')
-		except BooruNotFoundError:
+		except JSONDecodeError:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Ай! По тегу ничего не найдено :(")
 		except HTTPError:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Ай! Не могу получить ничего с Safebooru, может упал :(")
