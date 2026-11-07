@@ -51,7 +51,10 @@ def kb_settings_generate_types_commands(settings):
         ],
         [
             InlineKeyboardButton(text=f"Опросы | {marker(settings[4])}", callback_data='type_commands_polls'),
-            InlineKeyboardButton(text=f"Хм... | {marker(settings[5])}", callback_data='type_commands_hm')
+            InlineKeyboardButton(text=f"Хм... | {marker(settings[5])}", callback_data='type_commands_hm'),
+        ],
+        [
+            InlineKeyboardButton(text=f"Картинки с Safebooru | {marker(settings[6])}", callback_data='type_commands_booru')
         ],
         [InlineKeyboardButton(text="◀️ Назад", callback_data='generate_types')]
     ]
@@ -78,7 +81,7 @@ def kb_settings_generate_types_automatic(settings):
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
 
-def kb_settings_ignore_words():
+def kb_ignore_words():
     inline_kb_list = [
         [InlineKeyboardButton(text="Добавить игнорируемые слова", callback_data='ignore_words_add')],
         [InlineKeyboardButton(text="Очистить игнорируемые слова", callback_data='ignore_words_delete')],

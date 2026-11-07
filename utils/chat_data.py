@@ -48,7 +48,7 @@ async def write_words(text: str, chat_id: int) -> None:
 				await f.write(text + ",")
 	else:
 		pass
-  
+
 async def write_ban_words(text: str, chat_id: int) -> None:
 	"""Добавление слов и выражений в файл, созданный под чат, сообщения с которыми не будут добавляться в базу данных чата
 

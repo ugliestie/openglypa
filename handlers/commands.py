@@ -4,7 +4,12 @@ import random
 from aiogram import F, Router
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
-from aiogram.types import BufferedInputFile, Message, ReactionTypeEmoji
+from aiogram.types import (
+	BufferedInputFile,
+	LinkPreviewOptions,
+	Message,
+	ReactionTypeEmoji,
+)
 from aiogram.utils.chat_member import ADMINS
 
 from database.requests import get_commands_settings
@@ -212,6 +217,45 @@ async def generate_meme_message(message: Message):
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Что-то пошло не так и ничего не вышло намемить")
 	else:
 		return
+
+@router.message(F.text.lower().startswith('h j booru'))
+async def generate_yaoi_message(message: Message):
+	from urllib.error import HTTPError
+
+	from utils.booru import BooruNotFoundError, random_booru
+	if message.bot and (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is None or message.from_user.is_bot is False) and (await get_commands_settings(message.chat.id))[3] == 1 and type:
+		try:
+			arg = message.text[10:]
+			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
+			response = random_booru(arg)
+
+			if 'furry' in message.text.lower():
+				title = "🚨🚨🚨🚨 furry detected 🚨🚨🚨🚨\n"
+			elif 'yaoi' in message.text.lower():
+				title = "🚨🚨🚨🚨 yaoi detected 🚨🚨🚨🚨\n"
+			elif 'yuri' in message.text.lower():
+				title = "🚨🚨🚨🚨 yuri detected 🚨🚨🚨🚨\n"
+			else:
+				title = ""
+    
+			if response[1] != '':
+				credit = f"""<a href="{response[1]}">Источник</a>"""
+			else:
+				credit = "<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Нет информации об источнике"
+       
+			await message.reply(f"""{title}{credit}""",
+						link_preview_options=LinkPreviewOptions(url=str(response[0]), show_above_text=True))
+   
+		except TelegramBadRequest as e:
+			if "not enough rights" in str(e):
+				await handle_rights(message, 'commands', 'boorou')
+		except BooruNotFoundError:
+			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Ай! По тегу ничего не найдено :(")
+		except HTTPError:
+			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Ай! Не могу получить ничего с Safebooru, может упал :(")
+	else:
+		return
+# I'm so fucking good at this job ... (Kira optimized everything and I wrote funny names for variables and bruteforced shitty code. This is how coding should be)
 
 @router.message(F.text.lower() == 'h j p')
 async def generate_poll_message(message: Message):

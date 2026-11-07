@@ -84,6 +84,8 @@ async def process_callback_generate_types(callback: CallbackQuery):
 					await set_setting("commands", "polls", not(setting[4]), callback.message.chat.id)
 				elif callback.data == "type_commands_hm":
 					await set_setting("commands", "hm", not(setting[5]), callback.message.chat.id)
+				elif callback.data == "type_commands_booru":
+					await set_setting("commands", "booru", not(setting[6]), callback.message.chat.id)
 				await callback.message.edit_text(
 						text="⚙️ Настройки типов контента, который присылает бот с помощью команд",
 						reply_markup=kb_settings_generate_types_commands(await get_commands_settings(callback.message.chat.id))
