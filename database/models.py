@@ -25,6 +25,8 @@ class CommandsSettings(Base):
     memes = mapped_column(Boolean, default=True)
     polls = mapped_column(Boolean, default=True)
     hm = mapped_column(Boolean, default=True)
+    booru = mapped_column(Boolean, default=True)
+
 
 
 class AutomaticSettings(Base):
