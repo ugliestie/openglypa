@@ -3,10 +3,12 @@
         можешь смотреть я застрял
         wow """
         
-from pkld import pkld
-from aiogram import Bot
 import difflib
 import os
+
+from aiogram import Bot
+from pkld import pkld
+
 
 @pkld
 def last_file():

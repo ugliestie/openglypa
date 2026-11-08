@@ -6,14 +6,14 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
 from alembic.config import Config
-from rich.logging import RichHandler
 from rich import print
+from rich.logging import RichHandler
 
 from alembic import command
 from database.models import async_main
 from handlers import commands, different_types, group_join, settings
-from utils.config import TOKEN
 from handlers.update import update_broadcast
+from utils.config import TOKEN
 
 FORMAT = "%(message)s"
 logging.basicConfig(
