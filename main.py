@@ -64,6 +64,7 @@ async def on_startup():
 	alembic_cfg = Config("alembic.ini")
 	await asyncio.to_thread(command.upgrade, alembic_cfg, "head")
 	print('[green][b]База данных готова к работе![/b][/green]')
+	print('[green][b]Запускаем бота...[/b][/green]')
 	print("""[green]
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣶⣻⠽⣷⣶⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -107,8 +108,6 @@ async def main():
 	print('[green][b]Проверяем нововведения и отправляем рассылку по чатам...[/b][/green]')
  
 	await update_broadcast(bot)
-
-	print('[green][b]Запускаем бота...[/b][/green]')
 
 	await dp.start_polling(bot)
 	
