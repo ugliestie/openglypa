@@ -58,6 +58,7 @@ async def cmd_help(message: Message):
 						"""<code>h j t</code> - генерация Топор 1+ сообщения\n"""
 						"""<code>h j d</code> - генерация демотиватора\n"""
 						"""<code>h j m</code> - генерация мема из случайного шаблона\n"""
+						"""<code>h j booru [теги через пробел]</code> - рандомная картинка из Safebooru по тегам"""
 						"""<code>h j s</code> - настройки бота\n"""
 						"""<code>h j del</code> - удалить изображение/стикер из базы данных бота\n"""
 						"""<code>h j stats</code> - статистика базы данных чата\n"""
@@ -219,22 +220,24 @@ async def generate_meme_message(message: Message):
 		return
 
 @router.message(F.text.lower().startswith('h j booru'))
-async def generate_yaoi_message(message: Message):
+async def generate_booru_message(message: Message):
 	from json import JSONDecodeError
 	from urllib.error import HTTPError
 
 	from utils.booru import random_booru
-	if message.bot and (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is None or message.from_user.is_bot is False) and (await get_commands_settings(message.chat.id))[3] == 1 and type:
+	if message.bot and (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is None or message.from_user.is_bot is False) and (await get_commands_settings(message.chat.id))[3] == 1 and type(message.text) is str:
 		try:
 			arg = message.text[10:]
 			await message.bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
 			response = random_booru(arg)
 
-			if 'furry' in message.text.lower():
+			if 'gay' in arg:
+				title = "🐘 gaaaaayyyyyyyyy\n"
+			elif 'furry' in arg:
 				title = "🚨🚨🚨🚨 furry detected 🚨🚨🚨🚨\n"
-			elif 'yaoi' in message.text.lower():
+			elif 'yaoi' in arg:
 				title = "🚨🚨🚨🚨 yaoi detected 🚨🚨🚨🚨\n"
-			elif 'yuri' in message.text.lower():
+			elif 'yuri' in arg:
 				title = "🚨🚨🚨🚨 yuri detected 🚨🚨🚨🚨\n"
 			else:
 				title = ""
@@ -244,13 +247,12 @@ async def generate_yaoi_message(message: Message):
 			else:
 				credit = "<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Нет информации об источнике"
        
-			await message.reply(f"""{title}{credit}""",
+			await message.reply(f"""{title}<a href="https://safebooru.org/index.php?page=post&s=view&id={response[2]}">Safebooru</a> • {credit}""",
 						link_preview_options=LinkPreviewOptions(url=str(response[0]), show_above_text=True))
    
-		except TelegramBadRequest as e:
-			if "not enough rights" in str(e):
-				await handle_rights(message, 'commands', 'boorou')
 		except JSONDecodeError:
+			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Ай! По тегу ничего не найдено :(")
+		except IndexError:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Ай! По тегу ничего не найдено :(")
 		except HTTPError:
 			await message.reply("<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Ай! Не могу получить ничего с Safebooru, может упал :(")
