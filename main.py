@@ -29,7 +29,8 @@ def get_repo_state() -> str:
 		local_changes = [line for line in status_output if line and not line.startswith("??")]
 		url = subprocess.check_output(["git", "config", "remote.origin.url"],text=True).strip().replace('.git', '')
 		repo_name = url.split('/')[-1]
-		message = f"""Выполняется из <a href="{url}/commit/{commit}">{commit[:7]}@{repo_name}</a>"""
+		branch = subprocess.check_output(["git", "branch", "--show-current"],text=True).strip()
+		message = f"""Выполняется из <a href="{url}/commit/{commit}">{repo_name}@{branch}-{commit[:7]}</a>"""
 		if local_changes:
 			message += " с изменениями"
 		return message

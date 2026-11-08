@@ -63,7 +63,8 @@ async def cmd_help(message: Message):
 						"""<code>h j del</code> - удалить изображение/стикер из базы данных бота\n"""
 						"""<code>h j stats</code> - статистика базы данных чата\n"""
 						"""<code>h j h</code> - эта справка</blockquote>\n\n"""
-	  					+ state)
+	  					+ state,
+        				link_preview_options=LinkPreviewOptions(is_disabled=True))
 
 @router.message(F.text.lower().startswith('h j g'))
 async def force_generate(message: Message):
