@@ -7,11 +7,13 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
 from alembic.config import Config
 from rich.logging import RichHandler
+from rich import print
 
 from alembic import command
 from database.models import async_main
 from handlers import commands, different_types, group_join, settings
 from utils.config import TOKEN
+from handlers.update import update_broadcast
 
 FORMAT = "%(message)s"
 logging.basicConfig(
@@ -21,8 +23,17 @@ logging.basicConfig(
 				tracebacks_max_frames=1,
 				show_time=False)]
 )
+logger = logging.getLogger(__name__)
 
-def get_repo_state() -> str:
+def get_repo_state(kind: str = '') -> str:
+	"""Получение текущего репозиторияиз под которого запущен бот
+
+	Args:
+		kind (str): тип вывода
+  
+	Returns:
+		str: если kind не console, то отпраляется заготовка для h j h, если console - для консоли
+	"""
 	try:
 		commit = subprocess.check_output(["git", "rev-parse", "HEAD"],text=True).strip()
 		status_output = subprocess.check_output(["git", "status", "--porcelain"],text=True).splitlines()
@@ -30,9 +41,14 @@ def get_repo_state() -> str:
 		url = subprocess.check_output(["git", "config", "remote.origin.url"],text=True).strip().replace('.git', '')
 		repo_name = url.split('/')[-1]
 		branch = subprocess.check_output(["git", "branch", "--show-current"],text=True).strip()
-		message = f"""Выполняется из <a href="{url}/commit/{commit}">{repo_name}@{branch}-{commit[:7]}</a>"""
-		if local_changes:
-			message += " с изменениями"
+		if kind != "console":
+			message = f"""Выполняется из <a href="{url}/commit/{commit}">{repo_name}@{branch}-{commit[:7]}</a>"""
+			if local_changes:
+				message += " с изменениями"
+		else:
+			message = f"""Выполняется из {repo_name}@{branch}-{commit[:7]}"""
+			if local_changes:
+				message += " с изменениями"
 		return message
 	except subprocess.CalledProcessError:
 		return 'Выполняется не из репозитория'
@@ -47,8 +63,38 @@ async def on_startup():
 	await async_main()
 	alembic_cfg = Config("alembic.ini")
 	await asyncio.to_thread(command.upgrade, alembic_cfg, "head")
+	print('[green][b]База данных готова к работе![/b][/green]')
+	print("""[green]
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣶⣻⠽⣷⣶⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣤⣤⣤⡄⠀⠛⣽⣶⣹⣿⡃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢀⣶⡇⠀⠀⠀⠀⠀⡀⣶⡎⠉⠉⣿⣷⣶⣶⣿⣿⡒⢯⣷⣶⣶⣶⣶⣶⣶⣶⣶⣶⣆⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⡭⣿⡿⠀⠀⢠⣼⠿⠀⢠⣤⠀⣤⡄⠀⠀⠀⠘⠙⠊⠛⠛⠛⠛⠛⠏⠀⠀⠀⢸⣿⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⡵⢫⢿⣶⣶⡏⢹⣙⣦⡲⣽⠀⣏⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⢸⣿⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠿⣵⣏⡞⣥⣋⡇⠀⠀⠀⠰⠹⠜⠀⠀⠀⠀⣤⣤⣤⠀⣤⣤⣤⣤⣤⣤⣤⣯⡿⠋⠀⠀⣤⣤⣤⣤⡄⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⢵⣾⠀⠁⠁⠀⠀⢀⢀⠀⠀⠀⠀⢠⣶⠉⠉⠉⣶⣿⡿⡹⣶⣷⡎⠉⠉⠁⠀⠀⣶⡏⠉⠉⠉⢵⡆⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⡼⠿⠀⠀⠀⢠⣤⠿⠿⢿⣤⠄⢠⣬⢿⡄⠀⠀⠀⣯⠽⠿⣿⡇⠀⠀⠀⠀⢸⣿⣿⣿⣧⣤⠀⣺⡇⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡇⠀⠀⠀⠀⢸⣿⡀⠀⠀⠉⡶⡆⠉⠈⣖⣶⣲⣶⡍⠀⢐⣿⡇⠀⠀⣶⣶⣾⣿⣿⣿⣿⣿⣶⡏⠁⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡇⠀⠀⠀⢨⣽⠮⣤⢤⡤⡤⠿⠇⢀⡤⣤⡰⠿⠀⠀⢨⣟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡇⠀⠀⠀⢸⣿⣖⠁⠈⠀⠉⣷⡒⡾⡜⢦⡃⢀⣶⣶⡾⣽⣞⡿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠉⠁⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⣇⡤⠀⠀⠀⠸⠿⣿⣧⣠⣠⠀⠨⢵⣭⢧⣻⣟⣮⢷⣻⠷⣾⣽⣿⣿⣿⣿⣿⣿⠿⠿⠯⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⣿⠀⠀⠀⠀⠀⣿⣿⣿⡿⣶⣶⣾⢯⡟⣷⡻⣞⣯⡷⣿⣷⣿⡯⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣤⣤⣄⣸⣿⣯⣽⣽⣿⣿⣿⣿⣿⣧⣟⡾⣽⣯⣷⣿⣽⡿⢿⣿⣿⣿⣇⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⡮⠉⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣟⡿⣷⣾⣿⣷⣿⣿⣿⢭⡹⣍⠯⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡇⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⢳⣯⡽⣿⣗⡣⣝⣿⣿⣿⣿⣿⡧⣛⠴⡿⢿⣿⣿⣇⡀⠀⠀⠀⢀⣠⣠⣠⣀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠛⢳⡖⠀⠉⢿⣿⣿⣿⣿⣿⡿⣼⣻⢾⣿⣿⣧⠹⣿⣿⣿⣿⣿⣏⠷⣩⠞⣱⢻⣿⣿⣿⡇⠀⠀⣶⣮⠙⠉⣹⣷⣶
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠿⠿⠿⠿⠿⠂⠸⢿⣿⣷⣯⣿⣿⠲⣌⡳⡱⢎⠿⣿⠱⣎⠳⣥⢛⡴⢻⠿⡿⣿⣿⣿⡿⡇⠀⠀⠿⠇⢸⣿
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣿⡛⡵⢪⠵⣙⢎⡳⢎⡳⣌⠷⣌⠳⣜⢣⠻⡴⢻⣹⢻⠚⠃⠀⠀⠀⣰⣞⠛
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣿⢜⡱⣋⢞⡱⢎⡵⣋⠶⣩⠞⣬⢓⢮⣹⣿⣿⣿⡇⠀⠀⠀⢀⣀⠿⠇⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣾⣿⣿⡟⣛⢮⡱⣍⠮⣕⢫⠖⣭⢚⣵⣿⣶⣿⣶⣿⣿⠛⠛⢳⣶⣶⣶⣞⠛⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠿⠿⠿⢿⣿⣲⣓⣮⣳⣿⣿⣿⢿⡿⣿⡿⠿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠛⠛⠛⠛⠛⣿⣻⠟⠚⠚⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣰⠿⠄⠀⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣤⠛⠛⠛⠀⠀⠀⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠿⣀⣸⣿⣀⣿⣇⣨⠿⠁⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠛⠛⠛⠛⠛⠛⠛⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+	[/green]""")
 
-# Запуск процесса поллинга новых апдейтов
 async def main():
 	dp.startup.register(on_startup)
 
@@ -56,7 +102,16 @@ async def main():
 
 	await bot.delete_webhook(drop_pending_updates=True)
 
+	print(f"[yellow][b]{get_repo_state('console')}[/b][/yellow]")
+
+	print('[green][b]Проверяем нововведения и отправляем рассылку по чатам...[/b][/green]')
+ 
+	await update_broadcast(bot)
+
+	print('[green][b]Запускаем бота...[/b][/green]')
+
 	await dp.start_polling(bot)
+	
 
 if __name__ == "__main__":
 	asyncio.run(main())

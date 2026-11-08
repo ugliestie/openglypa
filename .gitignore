@@ -1,5 +1,6 @@
 chats/
 groups_settings.db
+handlers/.pkljar
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
