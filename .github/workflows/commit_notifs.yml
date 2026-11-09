@@ -5,16 +5,12 @@ on: push
 jobs:
   notify:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Отправить сообщение=
-        env:
-          TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          TO: ${{ secrets.TELEGRAM_CHANNEL_ID }}
-          MESSAGE: |
-            new commit by ${{ github.actor }} on ${{ github.head_ref }} 👀!
-            
-            ${{ github.event.head_commit.message }}
-            view changes: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
-        run:
-          curl -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" -d "chat_id=${TO}&text=${MESSAGE}"
+      - name: Run Telegram Notify Action
+        uses: proDreams/actions-telegram-notifier@main
+        if: always()
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          title: "new commit 👀"
+          notify_fields: "actor,repository,branch,commit"
