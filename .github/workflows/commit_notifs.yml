@@ -13,4 +13,4 @@ jobs:
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHANNEL_ID }}
           title: "new commit 👀"
-          notify_fields: "actor,repository,branch,commit"
+          notify_fields: "actor,branch,commit"
