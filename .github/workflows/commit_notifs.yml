@@ -16,4 +16,4 @@ jobs:
             commit: ${{ github.event.head_commit.message }}
             view changes: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
         run:
-          curl -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" -d "chat_id=$TO&text=$MESSAGE"
+          curl -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" -d "chat_id=$TO&text=$MESSAGE"
