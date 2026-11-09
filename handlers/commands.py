@@ -1,7 +1,7 @@
 import logging
 import random
 
-from aiogram import F, Router
+from aiogram import F, Router, flags
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 from aiogram.types import (
@@ -16,12 +16,14 @@ from database.requests import get_commands_settings
 from handlers.errors import handle_rights
 from keyboards.settings import kb_settings_main
 from keyboards.start import kb_add
+from middlewares.inner import ThrottlingMiddleware
 from utils.chat_data import NoSamples, RandomImageNotFound
 from utils.text import FailedByTries, PossibleStartsNotFound
 
 logger = logging.getLogger(__name__)
 
 router = Router()
+router.message.middleware(ThrottlingMiddleware())
 
 class NoBot(BaseException):
 	pass
@@ -58,7 +60,7 @@ async def cmd_help(message: Message):
 						"""<code>h j t</code> - генерация Топор 1+ сообщения\n"""
 						"""<code>h j d</code> - генерация демотиватора\n"""
 						"""<code>h j m</code> - генерация мема из случайного шаблона\n"""
-						"""<code>h j booru [теги через пробел]</code> - рандомная картинка из Safebooru по тегам"""
+						"""<code>h j booru [теги через пробел]</code> - рандомная картинка из Safebooru по тегам\n"""
 						"""<code>h j s</code> - настройки бота\n"""
 						"""<code>h j del</code> - удалить изображение/стикер из базы данных бота\n"""
 						"""<code>h j stats</code> - статистика базы данных чата\n"""
@@ -113,6 +115,7 @@ async def force_generate(message: Message):
 		return
 
 @router.message(F.text.lower() == 'h j t')
+@flags.rate_limit()
 async def generate_topor_message(message: Message):
 	from utils.chat_data import random_image
 	from utils.topor import generate_topor
@@ -153,6 +156,7 @@ async def generate_topor_message(message: Message):
 		return
 
 @router.message(F.text.lower() == 'h j d')
+@flags.rate_limit()
 async def generate_demotivator_message(message: Message):
 	from utils.chat_data import random_image
 	from utils.images import generate_demotivator
@@ -194,6 +198,7 @@ async def generate_demotivator_message(message: Message):
 		return
 
 @router.message(F.text.lower() == 'h j m')
+@flags.rate_limit()
 async def generate_meme_message(message: Message):
 	from utils.images import generate_meme
 	if message.bot and (message.chat.type == 'group' or message.chat.type == 'supergroup') and (message.from_user is None or message.from_user.is_bot is False) and (await get_commands_settings(message.chat.id))[3] == 1:

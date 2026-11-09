@@ -9,3 +9,4 @@ aiosqlite
 alembic
 rich
 aiofiles
+pkld

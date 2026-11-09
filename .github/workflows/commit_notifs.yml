@@ -1,0 +1,16 @@
+name: Уведомления о коммитах
+
+on: push
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Telegram Notify Action
+        uses: proDreams/actions-telegram-notifier@main
+        if: always()
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          title: "new commit 👀"
+          notify_fields: "actor,branch,commit"
