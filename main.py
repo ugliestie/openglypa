@@ -10,7 +10,7 @@ from rich import print
 from rich.logging import RichHandler
 
 from alembic import command
-from database.models import async_main
+from database.models import async_close, async_main
 from handlers import commands, different_types, group_join, settings
 from handlers.update import update_broadcast
 from utils.config import TOKEN
@@ -21,7 +21,7 @@ logging.basicConfig(
 				rich_tracebacks=True,
 				# tracebacks_show_locals=True, # разкоменчивать только в случае если надо, а то вывод бешеный
 				tracebacks_max_frames=1,
-				show_time=False)]
+				show_time=True)]
 )
 logger = logging.getLogger(__name__)
 
@@ -95,9 +95,16 @@ async def on_startup():
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠿⣀⣸⣿⣀⣿⣇⣨⠿⠁⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠛⠛⠛⠛⠛⠛⠛⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 	[/green]""")
+ 
+async def on_shutdown():
+    await bot.delete_webhook()
+    await bot.session.close()
+    await async_close()
+    print('[red][b]Пока![/b][/red]')
 
 async def main():
 	dp.startup.register(on_startup)
+	dp.shutdown.register(on_shutdown)
 
 	dp.include_routers(commands.router, different_types.router, settings.router, group_join.router)
 
