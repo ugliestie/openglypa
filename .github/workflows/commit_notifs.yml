@@ -6,9 +6,6 @@ jobs:
   notify:
     runs-on: ubuntu-latest
 
-    - name: Expose git commit data
-  uses: jcputney/git-commit-data-action@v2
-
     steps:
       - name: Send message to Telegram
         env:
