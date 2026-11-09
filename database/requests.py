@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 from database.models import AutomaticSettings, CommandsSettings, async_session
 
@@ -19,6 +19,20 @@ async def check_group(group_id: int) -> None:
             session.add(CommandsSettings(group_id=group_id))
             session.add(AutomaticSettings(group_id=group_id))
             await session.commit()
+            
+async def delete_group(group_id: int) -> None:
+    """Удалить группу
+
+    Args:
+        group_id (int): id группового чата
+    """
+    async with async_session() as session:
+        automatic = delete(AutomaticSettings).where(AutomaticSettings.group_id == str(group_id))
+        commands = delete(CommandsSettings).where(CommandsSettings.group_id == str(object=group_id))
+        
+        await session.execute(automatic)
+        await session.execute(commands)
+        await session.commit()
 
 async def get_commands_settings(group_id: int) -> tuple[bool, bool, bool, bool, bool, bool, bool]:
     """Получение списка включенных/выключенных и выключенных команд
