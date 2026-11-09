@@ -1,27 +1,20 @@
-name: telegram message notification
-on:
-  issues:
-    types: [opened, reopened, deleted, closed]
-  push:
-  pull_request:
-    types:
-      [
-        assigned,
-        opened,
-        closed,
-        reopened,
-        edited,
-        review_requested,
-        review_request_removed,
-        ready_for_review,
-      ]
-  issue_comment:
-  pull_request_review:
-  pull_request_review_comment:
+name: Уведомления о коммитах
+
+on: push
 
 jobs:
-  send-tele:
-    uses: ugliestie/github-notifs-telebot/.github/workflows/main.yml@main
-    secrets:
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
-      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Отправить сообщение=
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TO: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          MESSAGE: |
+            new commit by ${{ github.actor }} on ${{ github.head_ref }} 👀!
+            
+            ${{ github.event.head_commit.message }}
+            view changes: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+        run:
+          curl -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" -d "chat_id=${TO}&text=${MESSAGE}"
