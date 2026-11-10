@@ -10,3 +10,4 @@ alembic
 rich
 aiofiles
 pkld
+pre-commit

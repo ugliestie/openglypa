@@ -8,7 +8,7 @@ from aiogram.types import Message
 
 
 class ThrottlingMiddleware(BaseMiddleware):
-    def __init__(self, default_rate: float = 7) -> None:
+    def __init__(self, default_rate: float = 3) -> None:
         self.default_rate = default_rate
         # scoped per (user, handler): one handler's throttle must not
         # suppress unrelated handlers, like v2's per-handler rate_limit
@@ -28,7 +28,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         if flag is not None:
             rate = flag.get("rate", self.default_rate)
 
-        key = (event.from_user.id, data["handler"].callback)
+        key = (event.chat.id, data["handler"].callback)
         now = monotonic()
         last = self.last_call.get(key)
         if last is not None and now - last < rate:

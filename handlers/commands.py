@@ -8,7 +8,6 @@ from aiogram.types import (
     BufferedInputFile,
     LinkPreviewOptions,
     Message,
-    ReactionTypeEmoji,
 )
 from aiogram.utils.chat_member import ADMINS
 
@@ -42,12 +41,13 @@ async def is_message_admin(message: Message, user_id: int) -> bool:
 
 
 @router.message(Command("start"))
+@flags.rate_limit(3)
 async def cmd_start(message: Message):
     if message.bot:
         if message.chat.type == "private":
             await message.reply(
                 text="Привет, я Openglypa! <tg-emoji emoji-id='5197442707751996058'>🆗</tg-emoji> \nЯ анализирую сообщения в групповом чате и генерирую на его основе контент. \nДобавь меня в групповой чат и я начну учиться вашей группе!",
-                reply_markup=kb_add((await message.bot.get_me()).username),
+                reply_markup=kb_add((await message.bot.get_me()).username),  # ty: ignore[invalid-argument-type]
             )
         elif (message.chat.type == "group" or message.chat.type == "supergroup") and (
             message.from_user is None or message.from_user.is_bot is False
@@ -59,6 +59,7 @@ async def cmd_start(message: Message):
 
 @router.message(F.text.lower() == ("h j h"))
 @router.message(Command("help"))
+@flags.rate_limit(3)
 async def cmd_help(message: Message):
     from main import state
 
@@ -150,7 +151,7 @@ async def force_generate(message: Message):
 
 
 @router.message(F.text.lower() == "h j t")
-@flags.rate_limit()
+@flags.rate_limit(10)
 async def generate_topor_message(message: Message):
     from utils.chat_data import random_image
     from utils.topor import generate_topor
@@ -213,7 +214,7 @@ async def generate_topor_message(message: Message):
 
 
 @router.message(F.text.lower() == "h j d")
-@flags.rate_limit()
+@flags.rate_limit(10)
 async def generate_demotivator_message(message: Message):
     from utils.chat_data import random_image
     from utils.images import generate_demotivator
@@ -282,7 +283,7 @@ async def generate_demotivator_message(message: Message):
 
 
 @router.message(F.text.lower() == "h j m")
-@flags.rate_limit()
+@flags.rate_limit(10)
 async def generate_meme_message(message: Message):
     from utils.images import generate_meme
 
@@ -391,6 +392,7 @@ async def generate_booru_message(message: Message):
 
 
 @router.message(F.text.lower() == "h j p")
+@flags.rate_limit(6)
 async def generate_poll_message(message: Message):
     from utils.text import generate_sentence, generate_sentences
 
@@ -407,7 +409,7 @@ async def generate_poll_message(message: Message):
             if type_poll == "quiz":
                 await message.reply_poll(
                     question=await generate_sentence(message.chat.id),
-                    options=await generate_sentences(message.chat.id, count_options),
+                    options=await generate_sentences(message.chat.id, count_options),  # ty: ignore[invalid-argument-type]
                     type=type_poll,
                     explanation=await generate_sentence(message.chat.id),
                     correct_option_id=random.randint(0, count_options - 1),
@@ -416,7 +418,7 @@ async def generate_poll_message(message: Message):
             else:
                 await message.reply_poll(
                     question=await generate_sentence(message.chat.id),
-                    options=await generate_sentences(message.chat.id, count_options),
+                    options=await generate_sentences(message.chat.id, count_options),  # ty: ignore[invalid-argument-type]
                     type=type_poll,
                     is_anonymous=random.choice([True, False]),
                 )
@@ -550,7 +552,7 @@ async def generate_reply(message: Message):
         and (message.from_user is None or message.from_user.is_bot is False)
         and (await get_commands_settings(message.chat.id))[5] == 1
     ):
-        yn = random.randint(1, 10)
+        yn = random.randint(1, 9)
         if yn == 1:
             await message.reply("Неее...")
         if yn == 2:
@@ -570,25 +572,10 @@ async def generate_reply(message: Message):
         if yn == 7:
             await message.reply("Спокойным волнам на реке понравилось. Всё сбудется")
         if yn == 8:
-            set_reactions = [
-                "🤔",
-                "🤯",
-                "😢",
-                "🎉",
-                "🤩",
-                "🕊",
-                "🤷‍♂",
-                "🤷",
-                "🤷‍♀",
-                "😡",
-            ]
-            react = ReactionTypeEmoji(emoji=random.choice(set_reactions))
-            await message.react([react])
-        if yn == 9:
             await message.answer_sticker(
                 sticker="CAACAgIAAxkBAAEpAsFp--224lYB9gthIp4I36sDAAHjH5cAAiWPAAKHTklKtLyM8h5_QgE7BA"
             )
-        if yn == 10:
-            await message.reply("да давай ура даааааа")
+        if yn == 9:
+            await message.reply("ДА ДАВАЙ УРА ДА УРААААААА")
     else:
         return

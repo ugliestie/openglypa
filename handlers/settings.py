@@ -214,7 +214,7 @@ async def process_callback_ignore_words(callback: CallbackQuery):
     ):
         await callback.message.edit_text(
             text="🚫 Управление игнорируемыми словами",
-            reply_markup=kb_settings_ignore_words(),
+            reply_markup=kb_ignore_words(),
         )
     else:
         await callback.answer("Вы не вызывали данные настройки")
