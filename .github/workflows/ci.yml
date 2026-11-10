@@ -7,18 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install ruff
-      - name: Линтинг Ruff
-        run: ruff check --fix .
-      - name: Форматирование Ruff
-        run: ruff format .
+      - uses: astral-sh/ruff-action@v4.1.0
+      - run: ruff check --fix
+      - run: ruff format
       - name: Коммит
         id: commit
         run: |
