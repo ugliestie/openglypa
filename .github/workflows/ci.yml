@@ -1,0 +1,41 @@
+name: CI
+
+on: push
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+      - name: Линтинг Ruff
+        run: ruff check --fix .
+      - name: Форматирование Ruff
+        run: ruff format .
+      - name: Коммит
+        id: commit
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add -A
+            git commit -m "chore: линтинг и форматирование"
+            git push
+          else
+            echo "No changes to commit."
+          fi
+      - name: Уведомление о коммите
+        uses: proDreams/actions-telegram-notifier@main
+        if: always()
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          title: "new commit 👀"
+          notify_fields: "actor,branch,commit"
