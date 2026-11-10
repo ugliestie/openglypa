@@ -10,6 +10,18 @@ jobs:
       - uses: astral-sh/ruff-action@v4.1.0
       - run: ruff check --fix
       - run: ruff format
+      - name: Форматирование
+        id: format
+        uses: astral-sh/ruff-action@v4.1.0
+        with:
+          args: "format"
+        continue-on-error: true
+      - name: Проверка
+        id: check
+        uses: astral-sh/ruff-action@v4.1.0
+        with:
+          args: "check --fix"
+        continue-on-error: true
       - name: Коммит
         id: commit
         run: |
