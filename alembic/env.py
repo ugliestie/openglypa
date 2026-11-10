@@ -21,10 +21,7 @@ config = context.config
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
-config.set_main_option(
-    'sqlalchemy.url',
-    DB_URL
-)
+config.set_main_option("sqlalchemy.url", DB_URL)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -38,7 +35,9 @@ def run_migrations_offline() -> None:
 
 def do_run_migrations(connection: Connection) -> None:
     try:
-        context.configure(connection=connection, target_metadata=target_metadata, render_as_batch=True)
+        context.configure(
+            connection=connection, target_metadata=target_metadata, render_as_batch=True
+        )
 
         with context.begin_transaction():
             context.run_migrations()

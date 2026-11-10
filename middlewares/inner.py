@@ -32,6 +32,8 @@ class ThrottlingMiddleware(BaseMiddleware):
         now = monotonic()
         last = self.last_call.get(key)
         if last is not None and now - last < rate:
-            return await event.reply(f"<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я устаю!\nПопробуй снова через {now - last:.2f} секунд.")
+            return await event.reply(
+                f"<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я устаю!\nПопробуй снова через {now - last:.2f} секунд."
+            )
         self.last_call[key] = now
         return await handler(event, data)

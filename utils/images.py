@@ -11,822 +11,1088 @@ from utils.text import generate_sentence, generate_sentences
 # Для демотиваторов использовался код библиотеки simpledemotivators
 # https://github.com/Infqq/simpledemotivators/blob/main/simpledemotivators/Demotivator.py
 async def generate_demotivator(chat_id: int, image: BinaryIO) -> bytes:
-	"""Генерация демотиватора
+    """Генерация демотиватора
 
-	Args:
-		chat_id (int): id группового чата
-		image (bytes): изображение, которое будет в демотиваторе
+    Args:
+            chat_id (int): id группового чата
+            image (bytes): изображение, которое будет в демотиваторе
 
-	Returns:
-		bytes: готовый демотиватор
-	"""
+    Returns:
+            bytes: готовый демотиватор
+    """
 
-	img = Image.new('RGB', (1280, 1024), color='black')
-	img_border = Image.new('RGB', (1060, 720), color='#000000')
-	border = ImageOps.expand(img_border, border=2, fill='#ffffff')
-	user_img = Image.open(image).convert("RGBA").resize((1050, 710))
-	(width, _height) = user_img.size
-	img.paste(border, (111, 96))
-	img.paste(user_img, (118, 103))
-	drawer = ImageDraw.Draw(img)
+    img = Image.new("RGB", (1280, 1024), color="black")
+    img_border = Image.new("RGB", (1060, 720), color="#000000")
+    border = ImageOps.expand(img_border, border=2, fill="#ffffff")
+    user_img = Image.open(image).convert("RGBA").resize((1050, 710))
+    (width, _height) = user_img.size
+    img.paste(border, (111, 96))
+    img.paste(user_img, (118, 103))
+    drawer = ImageDraw.Draw(img)
 
-	font_name = "./utils/resources/fonts/timesnewroman.ttf"
-	top_size = 80
-	bottom_size = 60
+    font_name = "./utils/resources/fonts/timesnewroman.ttf"
+    top_size = 80
+    bottom_size = 60
 
-	text = await generate_sentences(chat_id=chat_id, count=2, size=3)
+    text = await generate_sentences(chat_id=chat_id, count=2, size=3)
 
-	font_1 = ImageFont.truetype(font=font_name, size=top_size, encoding='UTF-8')
-	text_width = font_1.getlength(text[0])
+    font_1 = ImageFont.truetype(font=font_name, size=top_size, encoding="UTF-8")
+    text_width = font_1.getlength(text[0])
 
-	while text_width >= (width + 250) - 20:
-		font_1 = ImageFont.truetype(font=font_name, size=top_size, encoding='UTF-8')
-		text_width = font_1.getlength(text[0])
-		top_size -= 1
+    while text_width >= (width + 250) - 20:
+        font_1 = ImageFont.truetype(font=font_name, size=top_size, encoding="UTF-8")
+        text_width = font_1.getlength(text[0])
+        top_size -= 1
 
-	font_2 = ImageFont.truetype(font=font_name, size=bottom_size, encoding='UTF-8')
-	text_width = font_2.getlength(text[1])
+    font_2 = ImageFont.truetype(font=font_name, size=bottom_size, encoding="UTF-8")
+    text_width = font_2.getlength(text[1])
 
-	while text_width >= (width + 250) - 20:
-		font_2 = ImageFont.truetype(font=font_name, size=bottom_size, encoding='UTF-8')
-		text_width = font_2.getlength(text[1])
-		bottom_size -= 1
+    while text_width >= (width + 250) - 20:
+        font_2 = ImageFont.truetype(font=font_name, size=bottom_size, encoding="UTF-8")
+        text_width = font_2.getlength(text[1])
+        bottom_size -= 1
 
-	size_1 = drawer.textlength(text[0], font=font_1)
-	size_2 = drawer.textlength(text[1], font=font_2)
+    size_1 = drawer.textlength(text[0], font=font_1)
+    size_2 = drawer.textlength(text[1], font=font_2)
 
-	drawer.text(((1280 - size_1) / 2, 840), text[0], fill='white', font=font_1)
-	drawer.text(((1280 - size_2) / 2, 930), text[1], fill='white', font=font_2)
-	
-	byte_io = BytesIO()
-	byte_io.name = 'image.jpg'
-	
-	img.save(byte_io, 'JPEG')
-	byte_io.seek(0)
+    drawer.text(((1280 - size_1) / 2, 840), text[0], fill="white", font=font_1)
+    drawer.text(((1280 - size_2) / 2, 930), text[1], fill="white", font=font_2)
 
-	return byte_io.read()
+    byte_io = BytesIO()
+    byte_io.name = "image.jpg"
+
+    img.save(byte_io, "JPEG")
+    byte_io.seek(0)
+
+    return byte_io.read()
+
 
 async def generate_meme(chat_id: int, bot: Bot) -> bytes:  # ty: ignore[invalid-return-type]
-	"""Генерация мема
-
-	Args:
-		chat_id (int): id группового чата
-
-	Returns:
-		bytes: готовый мем
-	"""
-	select = random.randint(1, 23)
-
-	if select == 1:
-		img = Image.open("./utils/resources/templates/1.jpg")
-		text = await generate_sentence(chat_id=chat_id)
-
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 25, encoding='UTF-8')
-		image_width, _image_height = img.size
-  
-		y_text = 750
-		lines = textwrap.wrap(text, width=11)
-  
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-  
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)-35, y_text), 
-					line, fill='white', font=font,
-	   				stroke_width=2, stroke_fill='black')
-			y_text += line_height
-		
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-	
-	if select == 2:
-		img = Image.open("./utils/resources/templates/2.jpg")
-		img_paste = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((639, 348))
-
-		img.paste(img_paste)
-		
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 3:
-		img = Image.open("./utils/resources/templates/3.jpg")
-		text = await generate_sentences(chat_id=chat_id, count=3)
-
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 35, encoding='UTF-8')
-		image_width = 595
-
-		y_text = 205
-		lines = textwrap.wrap(text[0], width=33)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2), y_text), 
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		y_text = 430
-		lines = textwrap.wrap(text[1], width=20)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)-125, y_text), 
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		y_text = 650
-		lines = textwrap.wrap(text[2], width=28)
-		if len(lines) != 1: y_text = 685
-		else: y_text = 713
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2), y_text), 
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-	
-	if select == 4:
-		img = Image.open("./utils/resources/templates/4.jpg")
-		img_paste = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((1000, 538))
-
-		img.paste(img_paste, (0, 460))
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 5:
-		img = Image.open("./utils/resources/templates/5.jpg")
-		img_paste = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((426, 299))
-
-		img.paste(img_paste, (520, 105))
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 6:
-		img = Image.open("./utils/resources/templates/6.jpg")
-	
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 15, encoding='UTF-8')
-		image_width, _image_height = img.size
-		text = await generate_sentence(chat_id=chat_id)
-		
-		y_text = 340
-		lines = textwrap.wrap(text, width=20)
-  
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-  
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)+5, y_text), 
-					line, fill='black', font=font)
-			y_text += line_height
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 7:
-		img = Image.open("./utils/resources/templates/7.jpg")
-	
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 35, encoding='UTF-8')
-		image_width, _image_height = img.size
-		text = await generate_sentence(chat_id=chat_id)
-		
-		y_text = 10
-		lines = textwrap.wrap(text, width=20)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2), y_text), 
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 8:
-		img = Image.open("./utils/resources/templates/8.jpg")
-	
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 32, encoding='UTF-8')
-		image_width, _image_height = img.size
-		text = await generate_sentences(chat_id=chat_id, count=3)
-		
-		y_text = 305
-		lines = textwrap.wrap(text[0], width=13)
-  
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-  
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)-190, y_text), 
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		y_text = 170
-		lines = textwrap.wrap(text[1], width=19)
-  
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-  
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)+90, y_text), 
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		y_text = 520
-		lines = textwrap.wrap(text[2], width=13)
-  
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-  
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)+190, y_text), 
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 9:
-		img = Image.open("./utils/resources/templates/9.jpg")
-	
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 20, encoding='UTF-8')
-		image_width, _image_height = img.size
-		text = await generate_sentences(chat_id=chat_id, count=2)
-		
-		y_text = 32
-		lines = textwrap.wrap(text[0], width=10)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)-165, y_text), 
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		y_text = 49
-		lines = textwrap.wrap(text[1], width=10)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)+190, y_text), 
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-	
-	if select == 10:
-		img = Image.open("./utils/resources/templates/10.png")
-	
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 50, encoding='UTF-8')
-		image_width = img.size[0]
-		text = await generate_sentences(chat_id=chat_id, count=2)
-		
-		y_text = 178
-		lines = textwrap.wrap(text[0], width=20)
-	
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-	
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2), y_text), 
-					line, fill='black', font=font)
-			y_text += line_height
-
-		y_text = 1156
-		lines = textwrap.wrap(text[1], width=20)
-	
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-	
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2), y_text), 
-					line, fill='black', font=font)
-			y_text += line_height
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.png'
-		
-		img.save(byte_io, 'PNG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 11:
-		img = Image.open("./utils/resources/templates/11.png")
-	
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 30, encoding='UTF-8')
-		image_width = img.size[0]
-		text = await generate_sentences(chat_id=chat_id, count=4)
-		
-		y_text = 250
-		lines = textwrap.wrap(text[0], width=15)
-  
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-  
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)-180, y_text), 
-					line, fill='black', font=font)
-			y_text += line_height
-
-		y_text = 250
-		lines = textwrap.wrap(text[1], width=15)
-  
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)+570, y_text), 
-					line, fill='black', font=font)
-			y_text += line_height
-
-		y_text = 730
-		lines = textwrap.wrap(text[2], width=15)
-  
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-
-		
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)-180, y_text), 
-					line, fill='black', font=font)
-			y_text += line_height
-
-		y_text = 730
-		lines = textwrap.wrap(text[3], width=15)
-  
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-
-		
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)+570, y_text), 
-					line, fill='black', font=font)
-			y_text += line_height
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.png'
-		
-		img.save(byte_io, 'PNG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-	
-	if select == 12:
-		img = Image.open("./utils/resources/templates/12.jpg")
-
-		img_paste_0 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((210, 53))
-		img.paste(img_paste_0, (146, 30))
-
-		img_paste_1 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
-		img.paste(img_paste_1, (30, 134))
-
-		img_paste_2 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
-		img.paste(img_paste_2, (235, 134))
-
-		img_paste_3 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
-		img.paste(img_paste_3, (438, 134))
-
-		img_paste_4 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
-		img.paste(img_paste_4, (30, 362))
-
-		img_paste_5 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
-		img.paste(img_paste_5, (235, 362))
-
-		img_paste_6 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
-		img.paste(img_paste_6, (438, 362))
-
-		img_paste_7 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
-		img.paste(img_paste_7, (30, 579))
-
-		img_paste_8 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
-		img.paste(img_paste_8, (235, 579))
-
-		img_paste_9 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((189, 132))
-		img.paste(img_paste_9, (438, 579))
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-	
-	if select == 13:
-		img = Image.open("./utils/resources/templates/13.jpg")
-	
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 50, encoding='UTF-8')
-		image_width = img.size[0]
-		text = await generate_sentence(chat_id=chat_id)
-		
-		y_text = 20
-		line_width = font.getbbox(text)[2]
-		drawer.text((((image_width - line_width) / 2), y_text), 
-					text, fill='black', font=font)
-		
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-	
-	if select == 14:
-		img = Image.open("./utils/resources/templates/14.png")
-	
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 20, encoding='UTF-8')
-		image_width = img.size[0]
-		text = await generate_sentence(chat_id=chat_id, size=1)
-		
-		y_text = 55
-		line_width = font.getbbox(text)[2]
-		drawer.text((((image_width - line_width) / 2)+58, y_text), 
-					text, fill='black', font=font)
-		
-		byte_io = BytesIO()
-		byte_io.name = 'image.png'
-		
-		img.save(byte_io, 'PNG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-	
-	if select == 15:
-		img = Image.open("./utils/resources/templates/15.png")
-
-		img_paste_1 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((411, 259))
-		img.paste(img_paste_1, (74, 34))
-
-		img_paste_2 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((277, 223))
-		img.paste(img_paste_2, (501, 744))
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.png'
-		
-		img.save(byte_io, 'PNG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-	
-	if select == 16:
-		img = Image.open("./utils/resources/templates/16.png")
-		img_0 = Image.open("./utils/resources/templates/16.png")
-		img_paste_1 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((581, 539))
-		img.paste(img_paste_1, (594, 6))
-		img.paste(img_0, mask=img_0)
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.png'
-		
-		img.save(byte_io, 'PNG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 17:
-		img = Image.open("./utils/resources/templates/17.jpg")
-		img_paste = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((355, 355))
-
-		img.paste(img_paste, (-81, 201))
-  
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 18:
-		img = Image.open("./utils/resources/templates/18.png")
-
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 50, encoding='UTF-8')
-		image_width = img.size[0]
-		text = await generate_sentence(chat_id=chat_id, size=2)
-		
-		y_text = 320
-		lines = textwrap.wrap(text, width=20)
-
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)-25, y_text), 
-					line, fill='black', font=font)
-			y_text += line_height
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.png'
-		
-		img.save(byte_io, 'PNG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 19:
-		img = Image.open("./utils/resources/templates/19.jpg")
-	
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 45, encoding='UTF-8')
-		image_width = img.size[0]
-		text = await generate_sentences(chat_id=chat_id, count=2)
-
-		y_text = 120
-		lines = textwrap.wrap(text[0], width=20)
-
-		if len(lines) > 1:
-			y_text -= (50 * (len(lines) - 1)) // 2
-
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2), y_text), 
-					line, fill='white', stroke_width=2, stroke_fill='black', font=font)
-			y_text += line_height
-
-		y_text = 565
-		lines = textwrap.wrap(text[1], width=25)
-	
-		if len(lines) > 1:
-			y_text -= (50 * (len(lines) - 1)) // 2
-
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2), y_text), 
-					line, fill='white', stroke_width=2, stroke_fill='black', font=font)
-			y_text += line_height
-   
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-   
-	if select == 20:
-		img = Image.open("./utils/resources/templates/20.jpg")
-	
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 40, encoding='UTF-8')
-		image_width = img.size[0]
-		text = await generate_sentence(chat_id=chat_id)
-	
-		y_text = 230
-		lines = textwrap.wrap(text, width=25)
-  
-		if len(lines) > 1:
-			y_text -= (font.size * (len(lines) - 1)) // 2
-  
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)-135, y_text), 
-					line, fill='white', stroke_width=2, stroke_fill='black', font=font)
-			y_text += line_height
-   
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-		
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 21:
-		img = Image.open("./utils/resources/templates/21.jpg")
-
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 45, encoding='UTF-8')
-		image_width, _image_height = img.size
-		text = await generate_sentences(chat_id=chat_id, count=2)
-
-		y_text = 4
-		lines = textwrap.wrap(text[0], width=30)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[2]
-			drawer.text((((image_width - line_width) / 2), y_text),
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		y_text = 440
-		lines = textwrap.wrap(text[1], width=20)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[2]
-			drawer.text((((image_width - line_width) / 2), y_text),
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 22:
-		img = Image.open("./utils/resources/templates/22.jpg")
-
-		drawer = ImageDraw.Draw(img)
-		font = ImageFont.truetype("./utils/resources/fonts/timesnewroman.ttf", 35, encoding='UTF-8')
-		font_title = ImageFont.truetype("./utils/resources/fonts/impact.ttf", 60, encoding='UTF-8')
-		image_width, _image_height = img.size
-		text = await generate_sentences(chat_id=chat_id, count=7, size=2)
-
-		y_text = 8
-		lines = textwrap.wrap(text[0]+"?", width=30)
-		for line in lines:
-			line_width = font_title.getbbox(line)[2]
-			line_height = font_title.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2), y_text),
-					line, fill='black', font=font_title)
-			y_text += line_height
-
-		y_text = 122
-		lines = textwrap.wrap(text[1], width=15)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)-235, y_text),
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		y_text = 122
-		lines = textwrap.wrap(text[2], width=15)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2), y_text),
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		y_text = 122
-		lines = textwrap.wrap(text[3], width=15)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)+245, y_text),
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		y_text = 438
-		lines = textwrap.wrap(text[4], width=15)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)-230, y_text),
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		y_text = 438
-		lines = textwrap.wrap(text[5], width=15)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2), y_text),
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		y_text = 438
-		lines = textwrap.wrap(text[6], width=15)
-		for line in lines:
-			line_width = font.getbbox(line)[2]
-			line_height = font.getbbox(line)[3]
-			drawer.text((((image_width - line_width) / 2)+245, y_text),
-					line, fill='white', font=font,
-					stroke_width=2, stroke_fill='black')
-			y_text += line_height
-
-		byte_io = BytesIO()
-		byte_io.name = 'image.jpg'
-
-		img.save(byte_io, 'JPEG')
-		byte_io.seek(0)
-
-		return byte_io.read()
-
-	if select == 23:
-		img = Image.new('RGB', (735, 717), color='white')
-		img_template = Image.open("./utils/resources/templates/23.png").convert("RGBA")
-		img_paste_1 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((365, 365))
-		img_paste_2 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((365, 365))
-		img_paste_3 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((365, 365))
-		img_paste_4 = Image.open(await random_image(chat_id=chat_id, bot=bot)).convert("RGBA").resize((365, 365))
-
-		img.paste(img_paste_1, (0, 0))
-		img.paste(img_paste_2, (370, 0))
-		img.paste(img_paste_3, (0, 370))
-		img.paste(img_paste_4, (370, 370))
-		img.paste(img_template, (0,0), img_template)
-  
-		byte_io = BytesIO()
-		byte_io.name = 'image.png'
-		
-		img.save(byte_io, 'PNG')
-		byte_io.seek(0)
-
-		return byte_io.read()
+    """Генерация мема
+
+    Args:
+            chat_id (int): id группового чата
+
+    Returns:
+            bytes: готовый мем
+    """
+    select = random.randint(1, 23)
+
+    if select == 1:
+        img = Image.open("./utils/resources/templates/1.jpg")
+        text = await generate_sentence(chat_id=chat_id)
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 25, encoding="UTF-8"
+        )
+        image_width, _image_height = img.size
+
+        y_text = 750
+        lines = textwrap.wrap(text, width=11)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) - 35, y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 2:
+        img = Image.open("./utils/resources/templates/2.jpg")
+        img_paste = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((639, 348))
+        )
+
+        img.paste(img_paste)
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 3:
+        img = Image.open("./utils/resources/templates/3.jpg")
+        text = await generate_sentences(chat_id=chat_id, count=3)
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 35, encoding="UTF-8"
+        )
+        image_width = 595
+
+        y_text = 205
+        lines = textwrap.wrap(text[0], width=33)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        y_text = 430
+        lines = textwrap.wrap(text[1], width=20)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) - 125, y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        y_text = 650
+        lines = textwrap.wrap(text[2], width=28)
+        if len(lines) != 1:
+            y_text = 685
+        else:
+            y_text = 713
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 4:
+        img = Image.open("./utils/resources/templates/4.jpg")
+        img_paste = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((1000, 538))
+        )
+
+        img.paste(img_paste, (0, 460))
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 5:
+        img = Image.open("./utils/resources/templates/5.jpg")
+        img_paste = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((426, 299))
+        )
+
+        img.paste(img_paste, (520, 105))
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 6:
+        img = Image.open("./utils/resources/templates/6.jpg")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 15, encoding="UTF-8"
+        )
+        image_width, _image_height = img.size
+        text = await generate_sentence(chat_id=chat_id)
+
+        y_text = 340
+        lines = textwrap.wrap(text, width=20)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) + 5, y_text),
+                line,
+                fill="black",
+                font=font,
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 7:
+        img = Image.open("./utils/resources/templates/7.jpg")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 35, encoding="UTF-8"
+        )
+        image_width, _image_height = img.size
+        text = await generate_sentence(chat_id=chat_id)
+
+        y_text = 10
+        lines = textwrap.wrap(text, width=20)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 8:
+        img = Image.open("./utils/resources/templates/8.jpg")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 32, encoding="UTF-8"
+        )
+        image_width, _image_height = img.size
+        text = await generate_sentences(chat_id=chat_id, count=3)
+
+        y_text = 305
+        lines = textwrap.wrap(text[0], width=13)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) - 190, y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        y_text = 170
+        lines = textwrap.wrap(text[1], width=19)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) + 90, y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        y_text = 520
+        lines = textwrap.wrap(text[2], width=13)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) + 190, y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 9:
+        img = Image.open("./utils/resources/templates/9.jpg")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 20, encoding="UTF-8"
+        )
+        image_width, _image_height = img.size
+        text = await generate_sentences(chat_id=chat_id, count=2)
+
+        y_text = 32
+        lines = textwrap.wrap(text[0], width=10)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) - 165, y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        y_text = 49
+        lines = textwrap.wrap(text[1], width=10)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) + 190, y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 10:
+        img = Image.open("./utils/resources/templates/10.png")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 50, encoding="UTF-8"
+        )
+        image_width = img.size[0]
+        text = await generate_sentences(chat_id=chat_id, count=2)
+
+        y_text = 178
+        lines = textwrap.wrap(text[0], width=20)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="black",
+                font=font,
+            )
+            y_text += line_height
+
+        y_text = 1156
+        lines = textwrap.wrap(text[1], width=20)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="black",
+                font=font,
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.png"
+
+        img.save(byte_io, "PNG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 11:
+        img = Image.open("./utils/resources/templates/11.png")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 30, encoding="UTF-8"
+        )
+        image_width = img.size[0]
+        text = await generate_sentences(chat_id=chat_id, count=4)
+
+        y_text = 250
+        lines = textwrap.wrap(text[0], width=15)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) - 180, y_text),
+                line,
+                fill="black",
+                font=font,
+            )
+            y_text += line_height
+
+        y_text = 250
+        lines = textwrap.wrap(text[1], width=15)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) + 570, y_text),
+                line,
+                fill="black",
+                font=font,
+            )
+            y_text += line_height
+
+        y_text = 730
+        lines = textwrap.wrap(text[2], width=15)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) - 180, y_text),
+                line,
+                fill="black",
+                font=font,
+            )
+            y_text += line_height
+
+        y_text = 730
+        lines = textwrap.wrap(text[3], width=15)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) + 570, y_text),
+                line,
+                fill="black",
+                font=font,
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.png"
+
+        img.save(byte_io, "PNG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 12:
+        img = Image.open("./utils/resources/templates/12.jpg")
+
+        img_paste_0 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((210, 53))
+        )
+        img.paste(img_paste_0, (146, 30))
+
+        img_paste_1 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((189, 132))
+        )
+        img.paste(img_paste_1, (30, 134))
+
+        img_paste_2 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((189, 132))
+        )
+        img.paste(img_paste_2, (235, 134))
+
+        img_paste_3 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((189, 132))
+        )
+        img.paste(img_paste_3, (438, 134))
+
+        img_paste_4 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((189, 132))
+        )
+        img.paste(img_paste_4, (30, 362))
+
+        img_paste_5 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((189, 132))
+        )
+        img.paste(img_paste_5, (235, 362))
+
+        img_paste_6 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((189, 132))
+        )
+        img.paste(img_paste_6, (438, 362))
+
+        img_paste_7 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((189, 132))
+        )
+        img.paste(img_paste_7, (30, 579))
+
+        img_paste_8 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((189, 132))
+        )
+        img.paste(img_paste_8, (235, 579))
+
+        img_paste_9 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((189, 132))
+        )
+        img.paste(img_paste_9, (438, 579))
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 13:
+        img = Image.open("./utils/resources/templates/13.jpg")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 50, encoding="UTF-8"
+        )
+        image_width = img.size[0]
+        text = await generate_sentence(chat_id=chat_id)
+
+        y_text = 20
+        line_width = font.getbbox(text)[2]
+        drawer.text(
+            (((image_width - line_width) / 2), y_text), text, fill="black", font=font
+        )
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 14:
+        img = Image.open("./utils/resources/templates/14.png")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 20, encoding="UTF-8"
+        )
+        image_width = img.size[0]
+        text = await generate_sentence(chat_id=chat_id, size=1)
+
+        y_text = 55
+        line_width = font.getbbox(text)[2]
+        drawer.text(
+            (((image_width - line_width) / 2) + 58, y_text),
+            text,
+            fill="black",
+            font=font,
+        )
+
+        byte_io = BytesIO()
+        byte_io.name = "image.png"
+
+        img.save(byte_io, "PNG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 15:
+        img = Image.open("./utils/resources/templates/15.png")
+
+        img_paste_1 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((411, 259))
+        )
+        img.paste(img_paste_1, (74, 34))
+
+        img_paste_2 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((277, 223))
+        )
+        img.paste(img_paste_2, (501, 744))
+
+        byte_io = BytesIO()
+        byte_io.name = "image.png"
+
+        img.save(byte_io, "PNG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 16:
+        img = Image.open("./utils/resources/templates/16.png")
+        img_0 = Image.open("./utils/resources/templates/16.png")
+        img_paste_1 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((581, 539))
+        )
+        img.paste(img_paste_1, (594, 6))
+        img.paste(img_0, mask=img_0)
+
+        byte_io = BytesIO()
+        byte_io.name = "image.png"
+
+        img.save(byte_io, "PNG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 17:
+        img = Image.open("./utils/resources/templates/17.jpg")
+        img_paste = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((355, 355))
+        )
+
+        img.paste(img_paste, (-81, 201))
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 18:
+        img = Image.open("./utils/resources/templates/18.png")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 50, encoding="UTF-8"
+        )
+        image_width = img.size[0]
+        text = await generate_sentence(chat_id=chat_id, size=2)
+
+        y_text = 320
+        lines = textwrap.wrap(text, width=20)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) - 25, y_text),
+                line,
+                fill="black",
+                font=font,
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.png"
+
+        img.save(byte_io, "PNG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 19:
+        img = Image.open("./utils/resources/templates/19.jpg")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 45, encoding="UTF-8"
+        )
+        image_width = img.size[0]
+        text = await generate_sentences(chat_id=chat_id, count=2)
+
+        y_text = 120
+        lines = textwrap.wrap(text[0], width=20)
+
+        if len(lines) > 1:
+            y_text -= (50 * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="white",
+                stroke_width=2,
+                stroke_fill="black",
+                font=font,
+            )
+            y_text += line_height
+
+        y_text = 565
+        lines = textwrap.wrap(text[1], width=25)
+
+        if len(lines) > 1:
+            y_text -= (50 * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="white",
+                stroke_width=2,
+                stroke_fill="black",
+                font=font,
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 20:
+        img = Image.open("./utils/resources/templates/20.jpg")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 40, encoding="UTF-8"
+        )
+        image_width = img.size[0]
+        text = await generate_sentence(chat_id=chat_id)
+
+        y_text = 230
+        lines = textwrap.wrap(text, width=25)
+
+        if len(lines) > 1:
+            y_text -= (font.size * (len(lines) - 1)) // 2
+
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) - 135, y_text),
+                line,
+                fill="white",
+                stroke_width=2,
+                stroke_fill="black",
+                font=font,
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 21:
+        img = Image.open("./utils/resources/templates/21.jpg")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 45, encoding="UTF-8"
+        )
+        image_width, _image_height = img.size
+        text = await generate_sentences(chat_id=chat_id, count=2)
+
+        y_text = 4
+        lines = textwrap.wrap(text[0], width=30)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[2]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        y_text = 440
+        lines = textwrap.wrap(text[1], width=20)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[2]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 22:
+        img = Image.open("./utils/resources/templates/22.jpg")
+
+        drawer = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "./utils/resources/fonts/timesnewroman.ttf", 35, encoding="UTF-8"
+        )
+        font_title = ImageFont.truetype(
+            "./utils/resources/fonts/impact.ttf", 60, encoding="UTF-8"
+        )
+        image_width, _image_height = img.size
+        text = await generate_sentences(chat_id=chat_id, count=7, size=2)
+
+        y_text = 8
+        lines = textwrap.wrap(text[0] + "?", width=30)
+        for line in lines:
+            line_width = font_title.getbbox(line)[2]
+            line_height = font_title.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="black",
+                font=font_title,
+            )
+            y_text += line_height
+
+        y_text = 122
+        lines = textwrap.wrap(text[1], width=15)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) - 235, y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        y_text = 122
+        lines = textwrap.wrap(text[2], width=15)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        y_text = 122
+        lines = textwrap.wrap(text[3], width=15)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) + 245, y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        y_text = 438
+        lines = textwrap.wrap(text[4], width=15)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) - 230, y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        y_text = 438
+        lines = textwrap.wrap(text[5], width=15)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2), y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        y_text = 438
+        lines = textwrap.wrap(text[6], width=15)
+        for line in lines:
+            line_width = font.getbbox(line)[2]
+            line_height = font.getbbox(line)[3]
+            drawer.text(
+                (((image_width - line_width) / 2) + 245, y_text),
+                line,
+                fill="white",
+                font=font,
+                stroke_width=2,
+                stroke_fill="black",
+            )
+            y_text += line_height
+
+        byte_io = BytesIO()
+        byte_io.name = "image.jpg"
+
+        img.save(byte_io, "JPEG")
+        byte_io.seek(0)
+
+        return byte_io.read()
+
+    if select == 23:
+        img = Image.new("RGB", (735, 717), color="white")
+        img_template = Image.open("./utils/resources/templates/23.png").convert("RGBA")
+        img_paste_1 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((365, 365))
+        )
+        img_paste_2 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((365, 365))
+        )
+        img_paste_3 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((365, 365))
+        )
+        img_paste_4 = (
+            Image.open(await random_image(chat_id=chat_id, bot=bot))
+            .convert("RGBA")
+            .resize((365, 365))
+        )
+
+        img.paste(img_paste_1, (0, 0))
+        img.paste(img_paste_2, (370, 0))
+        img.paste(img_paste_3, (0, 370))
+        img.paste(img_paste_4, (370, 370))
+        img.paste(img_template, (0, 0), img_template)
+
+        byte_io = BytesIO()
+        byte_io.name = "image.png"
+
+        img.save(byte_io, "PNG")
+        byte_io.seek(0)
+
+        return byte_io.read()

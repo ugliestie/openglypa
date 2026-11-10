@@ -8,7 +8,8 @@ engine = create_async_engine(url=DB_URL)
 
 async_session = async_sessionmaker(engine)
 
-extend = {'extend_existing': True} 
+extend = {"extend_existing": True}
+
 
 class Base(AsyncAttrs, DeclarativeBase):
     pass
@@ -28,7 +29,6 @@ class CommandsSettings(Base):
     booru = mapped_column(Boolean, default=True)
 
 
-
 class AutomaticSettings(Base):
     __tablename__ = "group_automatic_settings"
     __table_args__ = extend
@@ -43,12 +43,12 @@ class AutomaticSettings(Base):
     reactions = mapped_column(Boolean, default=True)
     stickers = mapped_column(Boolean, default=True)
     animations = mapped_column(Boolean, default=True)
-    
 
 
 async def async_main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
 
 async def async_close():
     await engine.dispose()
