@@ -1,39 +1,36 @@
+# https://github.com/Vealke/ACHY-Plus/blob/1d3c8b53d96ee8d76890d2a59c2116e75d516416/src/telegram/middleware/ratelimit.py#L8
 from collections.abc import Awaitable, Callable
-from time import monotonic
 from typing import Any
 
 from aiogram import BaseMiddleware
-from aiogram.dispatcher.flags import get_flag
-from aiogram.types import Message
+from aiogram.types import Message, TelegramObject
+from cachetools import TTLCache
 
 
 class ThrottlingMiddleware(BaseMiddleware):
-    def __init__(self, default_rate: float = 3) -> None:
-        self.default_rate = default_rate
-        # scoped per (user, handler): one handler's throttle must not
-        # suppress unrelated handlers, like v2's per-handler rate_limit
-        self.last_call: dict[tuple[int, Any], float] = {}
+    cache: TTLCache[int, Any]
+
+    def __init__(self, time_limit: float = 2.5) -> None:
+        super().__init__()
+        self.cache = TTLCache(maxsize=10_000, ttl=time_limit)
 
     async def __call__(
         self,
-        handler: Callable[[Message, dict[str, Any]], Awaitable[Any]],
-        event: Message,
+        handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],
+        event: TelegramObject,
         data: dict[str, Any],
     ) -> Any:
-        if event.from_user is None:  # channel posts have no sender
-            return await handler(event, data)
+        # Проверяем, что событие является сообщением (Message)
+        if isinstance(event, Message):
+            chat_id = event.chat.id
 
-        rate = self.default_rate
-        flag = get_flag(data, "rate_limit")
-        if flag is not None:
-            rate = flag.get("rate", self.default_rate)
+            # Если чат уже есть в кэше — игнорируем его сообщение
+            if chat_id in self.cache:
+                await event.reply(
+                    "<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я устаю!\nПопробуй попозже."
+                )
+                return
 
-        key = (event.chat.id, data["handler"].callback)
-        now = monotonic()
-        last = self.last_call.get(key)
-        if last is not None and now - last < rate:
-            return await event.reply(
-                f"<tg-emoji emoji-id='5197389312718575425'>😪</tg-emoji> Я устаю!\nПопробуй снова через {now - last:.2f} секунд."
-            )
-        self.last_call[key] = now
+            self.cache[chat_id] = True
+
         return await handler(event, data)

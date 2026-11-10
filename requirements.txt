@@ -11,3 +11,4 @@ rich
 aiofiles
 pkld
 pre-commit
+cachetools
