@@ -12,3 +12,8 @@ repos:
       - id: ruff-format
       - id: ruff-check
         args: [ --fix, --exit-zero ]
+
+  - repo: https://github.com/ugliestie/openglypa_hooks
+    rev: v0.0.1
+    hooks:
+      - id: check-memes
